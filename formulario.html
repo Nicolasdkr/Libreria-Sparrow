@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Librería Sparrow - Compra de Libros</title>
+    <link rel="stylesheet" href="css/estilos.css" />
+  </head>
+  <body>
+    <header class="header">
+      <div class="header-contenido">
+        <img class="header_logo" src="img/logo_tienda_libros.webp" alt="Logo" />
+        <h1>Librería Sparrow</h1>
+      </div>
+      <nav>
+        <a href="contacto.html">Contáctanos</a>
+        <a href="nosotros.html">Quiénes somos</a>
+        <a href="admin.html">Acceso Admin</a>
+        <a href="nuevo.html">aaaa</a>
+      </nav>
+    </header>
+
+    <main class="contenedor">
+      <section class="catalogo">
+        <h2>Formulario de Compra</h2>
+        <form id="form-compra">
+          <!-- Datos del comprador -->
+          <label for="nombre">Nombre completo:</label>
+          <input type="text" id="nombre" name="nombre" required />
+
+          <label for="rut">RUT:</label>
+          <input
+            type="text"
+            id="rut"
+            name="rut"
+            placeholder="Ej: 12.345.678-9"
+            required
+          />
+
+          <label for="email">Correo electrónico:</label>
+          <input type="email" id="email" name="email" required />
+
+          <label for="telefono">Teléfono:</label>
+          <input
+            type="tel"
+            id="telefono"
+            name="telefono"
+            placeholder="+569..."
+            required
+          />
+
+          <label for="direccion">Dirección de envío:</label>
+          <input type="text" id="direccion" name="direccion" required />
+
+          <!-- Selector de libro -->
+          <label for="libro">Selecciona un libro:</label>
+          <select id="libro" name="libro" required>
+            <option value="">-- Selecciona un libro --</option>
+            <option value="imperio_final">El Imperio Final - $12000</option>
+            <option value="cementerio_animales">
+              Cementerio de Animales - $9500
+            </option>
+            <option value="nombre_del_viento">
+              El Nombre del Viento - $13500
+            </option>
+            <option value="harry_potter">
+              Harry Potter y el Prisionero de Azkaban - $11000
+            </option>
+            <option value="lotm">Lord of the Mysteries - $14000</option>
+            <option value="orgullo">Orgullo y Prejuicio - $8000</option>
+          </select>
+
+          <!-- Imagen y precio -->
+          <div id="info-libro" style="margin: 15px 0">
+            <img
+              id="imagen-libro"
+              src=""
+              alt="Imagen del libro"
+              style="max-width: 200px; display: none; border-radius: 8px"
+            />
+            <p id="precio-libro" style="font-weight: bold"></p>
+          </div>
+
+          <!-- Cantidad -->
+          <label for="cantidad">Cantidad:</label>
+          <input
+            type="number"
+            id="cantidad"
+            name="cantidad"
+            min="1"
+            max="1000"
+            value="1"
+            required
+          />
+
+          <!-- Método de pago -->
+          <label for="pago">Método de pago:</label>
+          <select id="pago" name="pago" required>
+            <option value="">-- Selecciona un método --</option>
+            <option value="Tarjeta de Crédito">Tarjeta de Crédito</option>
+            <option value="Transferencia Bancaria">
+              Transferencia Bancaria
+            </option>
+            <option value="Pago Contra Entrega">Pago Contra Entrega</option>
+          </select>
+
+          <!-- Tipo de envío -->
+          <label>Método de envío:</label>
+          <div class="envio-opciones">
+            <label
+              ><input type="radio" name="envio" value="Exprés" required /> Envío
+              Exprés</label
+            >
+            <label
+              ><input type="radio" name="envio" value="Estándar" /> Envío
+              Estándar</label
+            >
+          </div>
+
+          <!-- Fecha de nacimiento -->
+          <label for="fecha_nacimiento">Fecha de nacimiento:</label>
+          <input
+            type="date"
+            id="fecha_nacimiento"
+            name="fecha_nacimiento"
+            required
+          />
+          <button type="button" id="calcular-edad">Calcular Edad</button>
+          <p id="resultado-edad"></p>
+
+          <!-- Encriptar nombre -->
+          <button type="button" id="encriptar-nombre">Encriptar Nombre</button>
+          <p id="nombre-encriptado"></p>
+
+          <!-- Botón de envío -->
+          <button type="submit">Realizar Compra</button>
+        </form>
+      </section>
+
+      <!-- Sección de valores económicos (API) -->
+      <section class="indicadores">
+        <h2>Valores del Día (API mindicador.cl)</h2>
+        <ul>
+          <li>UF: <span id="valor-uf">Cargando...</span></li>
+          <li>UTM: <span id="valor-utm">Cargando...</span></li>
+          <li>EURO: <span id="valor-euro">Cargando...</span></li>
+        </ul>
+        <label for="convertir-monto">Convertir total a otra moneda:</label>
+        <input type="number" id="convertir-monto" placeholder="Monto en CLP" />
+        <select id="convertir-moneda">
+          <option value="uf">UF</option>
+          <option value="utm">UTM</option>
+          <option value="euro">EURO</option>
+        </select>
+        <button id="btn-convertir">Convertir</button>
+        <p id="resultado-conversion"></p>
+      </section>
+
+      <!-- Resumen de la compra -->
+      <section id="resumen" style="display: none; margin-top: 20px">
+        <h3>Resumen de la Compra</h3>
+        <ul id="resumen-lista"></ul>
+      </section>
+    </main>
+
+    <footer>
+      <p>&copy; 2025 Librería Sparrow</p>
+    </footer>
+
+    <script src="js/index.js"></script>
+  </body>
+</html>

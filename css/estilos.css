@@ -1,0 +1,174 @@
+/* Reset */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* Cuerpo general */
+body {
+  font-family: "Segoe UI", sans-serif;
+  background-color: #f9f9f9;
+  color: #333;
+  line-height: 1.6;
+  padding: 20px;
+}
+
+/* Contenedor principal */
+.contenedor {
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+/* Header */
+.header {
+  background-color: #b31b1b;
+  color: white;
+  padding: 20px;
+  border-radius: 10px;
+  text-align: center;
+  margin-bottom: 30px;
+}
+
+.header-contenido {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.header_logo {
+  width: 70px;
+  height: auto;
+  margin-bottom: 10px;
+}
+
+nav {
+  margin-top: 10px;
+}
+
+nav a {
+  color: #fff;
+  margin: 0 12px;
+  text-decoration: none;
+  font-weight: bold;
+}
+
+nav a:hover {
+  text-decoration: underline;
+}
+
+/* Formulario */
+form label {
+  display: block;
+  margin-top: 12px;
+  font-weight: 500;
+}
+
+form input,
+form select {
+  width: 100%;
+  padding: 8px;
+  margin-top: 5px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+}
+
+form input[type="radio"] {
+  width: auto;
+  margin-right: 6px;
+}
+
+form button {
+  background-color: #1b7ab3;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  font-size: 1rem;
+  margin-top: 20px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+form button:hover {
+  background-color: #145c87;
+}
+
+/* Imagen del libro */
+#info-libro {
+  text-align: center;
+}
+
+#precio-libro {
+  margin-top: 10px;
+  font-size: 1.2rem;
+  color: #444;
+}
+
+/* Opciones de envío */
+.envio-opciones {
+  display: flex;
+  gap: 20px;
+  margin-top: 10px;
+}
+
+.envio-opciones label {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+}
+
+/* Resultados (edad, encriptado) */
+#resultado-edad,
+#nombre-encriptado {
+  margin-top: 10px;
+  font-weight: bold;
+  color: #444;
+}
+
+/* API valores */
+.indicadores {
+  background-color: #eeeeee;
+  padding: 15px;
+  margin-top: 40px;
+  border-radius: 10px;
+}
+
+.indicadores h2 {
+  margin-bottom: 10px;
+}
+
+.indicadores ul {
+  list-style-type: disc;
+  padding-left: 20px;
+  margin-bottom: 15px;
+}
+
+/* Resumen */
+#resumen {
+  background-color: #e9f7ef;
+  border-left: 6px solid #4caf50;
+  padding: 20px;
+  border-radius: 10px;
+}
+
+#resumen h3 {
+  margin-bottom: 10px;
+}
+
+#resumen-lista li {
+  margin-bottom: 6px;
+}
+
+/* Responsive básico */
+@media (max-width: 600px) {
+  .header-contenido {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+
+  .envio-opciones {
+    flex-direction: column;
+  }
+}

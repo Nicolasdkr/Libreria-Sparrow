@@ -1,0 +1,39 @@
+<!-- admin.html - Página del administrador -->
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Admin - Libros y Pedidos</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <h1>Administrador de Libros</h1>
+    <form id="formLibro">
+      <input type="hidden" id="indiceLibro" />
+
+      <label for="titulo">Título:</label>
+      <input type="text" id="titulo" required />
+
+      <label for="autor">Autor:</label>
+      <input type="text" id="autor" required />
+
+      <label for="precio">Precio:</label>
+      <input type="number" id="precio" required />
+
+      <label for="imagen">Imagen (URL):</label>
+      <input type="text" id="imagen" />
+
+      <button type="submit">Guardar Libro</button>
+    </form>
+
+    <h2>Lista de Libros</h2>
+    <div id="listaLibros"></div>
+
+    <h1>Administrador de Pedidos</h1>
+    <div id="listaPedidos"></div>
+
+    <script src="utils.js"></script>
+    <script src="script.js"></script>
+  </body>
+</html>
