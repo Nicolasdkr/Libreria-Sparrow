@@ -10,7 +10,7 @@
     />
     <link rel="stylesheet" href="css/estilos.css" />
   </head>
-  <body>
+  <body class="formulario-bg">
     <!-- Header -->
     <nav class="navbar navbar-expand-lg navbar-dark bg-rojo-sparrow">
       <div class="container-fluid">
@@ -37,10 +37,7 @@
               <a class="nav-link active" href="index.html">Inicio</a>
             </li>
             <li class="nav-item">
-              <a class="nav-link" href="#quienes-somos">?</a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" href="formulario.html">Comprar</a>
+              <a class="nav-link" href="#">Diagramas</a>
             </li>
             <li class="nav-item">
               <a class="nav-link" href="admin.html">Admin</a>
@@ -52,7 +49,9 @@
 
     <!-- Formulario -->
     <div class="container my-5">
-      <h2 class="text-center mb-4 text-danger">Formulario de Compra</h2>
+      <h2 class="text-center mb-4 text-dark fs-2 fw-bold">
+        Formulario de Compra
+      </h2>
 
       <form
         id="form-compra"
@@ -164,7 +163,7 @@
           />
           <button
             type="button"
-            class="btn btn-outline-light mt-2"
+            class="btn btn-outline-danger mt-2"
             id="aplicar-descuento"
           >
             Aplicar Descuento
@@ -198,7 +197,7 @@
               required
             />
             <label class="form-check-label" for="envio_expres"
-              >Exprés (1 semana)</label
+              >Envío Express ($10.000)</label
             >
           </div>
           <div class="form-check">
@@ -210,7 +209,7 @@
               id="envio_estandar"
             />
             <label class="form-check-label" for="envio_estandar"
-              >Estándar (3 semanas)</label
+              >Envío Estándar ($5.000)</label
             >
           </div>
           <p id="info-envio" class="mt-2 text-info fw-bold"></p>
@@ -263,9 +262,11 @@
       </form>
 
       <!-- Valores API -->
-      <section class="mt-5 p-4 bg-light border rounded">
+      <section
+        class="mt-5 p-4 bg-light text-dark border border-danger rounded shadow"
+      >
         <h3 class="text-center mb-3">
-          💸Combierte las monedas que quieres tu solo💸
+          💸 ¿Quieres convertir monedas tú mismo? ¡Hazlo aquí! 💸
         </h3>
         <h4 class="mb-3 text-danger">Valores del Día (API mindicador.cl)</h4>
         <ul class="mb-3">

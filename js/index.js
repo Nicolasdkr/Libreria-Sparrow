@@ -1,20 +1,6 @@
 document.addEventListener("DOMContentLoaded", () => {
   cargarAPI();
   configurarEventos();
-
-  // Espera 100 ms para asegurarse de que el modal existe
-  setTimeout(() => {
-    const promoElement = document.getElementById("modalPromo");
-    if (promoElement) {
-      const promo = new bootstrap.Modal(promoElement);
-      promo.show();
-
-      // Cerrar automáticamente a los 5 segundos
-      setTimeout(() => {
-        promo.hide();
-      }, 5000);
-    }
-  }, 100);
 });
 
 function configurarEventos() {

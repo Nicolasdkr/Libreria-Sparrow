@@ -37,7 +37,7 @@
               <a class="nav-link active" href="index.html">Inicio</a>
             </li>
             <li class="nav-item">
-              <a class="nav-link" href="#quienes-somos">?</a>
+              <a class="nav-link" href="#">Diagramas</a>
             </li>
             <li class="nav-item">
               <a class="nav-link" href="formulario.html">Comprar</a>
@@ -224,11 +224,11 @@
     </section>
 
     <!-- Modal Promoción -->
-    <div class="modal fade" id="modalPromo" tabindex="-1">
+    <div class="modal fade" id="modalPromo" tabindex="-1" aria-hidden="true">
       <div class="modal-dialog">
-        <div class="modal-content border-danger">
+        <div class="modal-content border-primary">
           <div class="modal-header">
-            <h5 class="modal-title text-danger">🎉 ¡Promoción CyberDay!</h5>
+            <h5 class="modal-title">🎉 ¡Promoción CyberDay!</h5>
             <button
               type="button"
               class="btn-close"
@@ -242,13 +242,28 @@
             <code>FANTASIA10</code>.
           </div>
           <div class="modal-footer">
-            <button class="btn btn-outline-danger" data-bs-dismiss="modal">
-              ¡Entendido!
+            <button
+              type="button"
+              class="btn btn-primary"
+              data-bs-dismiss="modal"
+            >
+              Aceptar
             </button>
           </div>
         </div>
       </div>
     </div>
+
+    <!-- Script para abrir el modal automáticamente (no me salia de otra manera) -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        const modalPromo = new bootstrap.Modal(
+          document.getElementById("modalPromo")
+        );
+        modalPromo.show();
+      });
+    </script>
 
     <!-- Footer -->
     <footer class="bg-rojo-sparrow text-white text-center py-3">
