@@ -12,7 +12,7 @@
   </head>
   <body>
     <!-- Header -->
-    <nav class="navbar navbar-expand-lg navbar-dark navbar-red">
+    <nav class="navbar navbar-expand-lg navbar-dark bg-rojo-sparrow">
       <div class="container-fluid">
         <a class="navbar-brand" href="#">
           <img
@@ -54,80 +54,65 @@
     <div class="container my-5">
       <h2 class="text-center mb-4 text-danger">Formulario de Compra</h2>
 
-      <form id="form-compra" class="card p-4 shadow">
+      <form
+        id="form-compra"
+        class="card p-4 shadow bg-light text-dark border border-danger"
+      >
         <!-- Datos del comprador -->
-        <div class="mb-3">
-          <label for="nombre" class="form-label">Nombre completo</label>
-          <input
-            type="text"
-            class="form-control"
-            id="nombre"
-            name="nombre"
-            required
-          />
-        </div>
-        <div class="mb-3">
-          <label for="direccion" class="form-label">Dirección</label>
-          <input
-            type="text"
-            class="form-control"
-            id="direccion"
-            name="direccion"
-            required
-          />
-        </div>
-        <div class="mb-3">
-          <label for="rut" class="form-label">RUT</label>
-          <input
-            type="text"
-            class="form-control"
-            id="rut"
-            name="rut"
-            placeholder="12.345.678-9"
-            required
-          />
-        </div>
-
-        <div class="mb-3">
-          <label for="email" class="form-label">Correo electrónico</label>
-          <input
-            type="email"
-            class="form-control"
-            id="email"
-            name="email"
-            required
-          />
-        </div>
-
-        <div class="mb-3">
-          <label for="telefono" class="form-label">Teléfono</label>
-          <input
-            type="tel"
-            class="form-control"
-            id="telefono"
-            name="telefono"
-            placeholder="+569..."
-            required
-          />
+        <h5 class="text-danger mb-3">📋 Datos del Comprador</h5>
+        <div class="row g-3">
+          <div class="col-md-6">
+            <label for="nombre" class="form-label">Nombre completo</label>
+            <input type="text" class="form-control" id="nombre" required />
+          </div>
+          <div class="col-md-6">
+            <label for="direccion" class="form-label">Dirección</label>
+            <input type="text" class="form-control" id="direccion" required />
+          </div>
+          <div class="col-md-6">
+            <label for="rut" class="form-label">RUT</label>
+            <input
+              type="text"
+              class="form-control"
+              id="rut"
+              placeholder="12.345.678-9"
+              required
+            />
+          </div>
+          <div class="col-md-6">
+            <label for="email" class="form-label">Correo electrónico</label>
+            <input type="email" class="form-control" id="email" required />
+          </div>
+          <div class="col-md-6">
+            <label for="telefono" class="form-label">Teléfono</label>
+            <input
+              type="tel"
+              class="form-control"
+              id="telefono"
+              placeholder="+569..."
+              required
+            />
+          </div>
+          <div class="col-md-6">
+            <label for="pais-envio" class="form-label">País de envío</label>
+            <select class="form-select" id="pais-envio" required>
+              <option value="">-- Selecciona un país --</option>
+              <option value="CLP">Chile</option>
+              <option value="UF">Chile (UF)</option>
+              <option value="UTM">Chile (UTM)</option>
+              <option value="EURO">España</option>
+              <option value="EURO">Alemania</option>
+              <option value="EURO">Francia</option>
+            </select>
+          </div>
         </div>
 
-        <div class="mb-3">
-          <label for="pais-envio" class="form-label">País de envío</label>
-          <select class="form-select" id="pais-envio" required>
-            <option value="">-- Selecciona un país --</option>
-            <option value="CLP">Chile</option>
-            <option value="UF">Chile (UF)</option>
-            <option value="UTM">Chile (UTM)</option>
-            <option value="EURO">España</option>
-            <option value="EURO">Alemania</option>
-            <option value="EURO">Francia</option>
-          </select>
-        </div>
-
-        <!-- Libro -->
+        <!-- Libro y cantidad -->
+        <hr class="my-4 border-danger" />
+        <h5 class="text-danger mb-3">📚 Selección del Libro</h5>
         <div class="mb-3">
           <label for="libro" class="form-label">Libro</label>
-          <select class="form-select" id="libro" name="libro" required>
+          <select class="form-select" id="libro" required>
             <option value="">-- Selecciona un libro --</option>
             <option value="imperio_final">El Imperio Final - $12000</option>
             <option value="cementerio_animales">
@@ -147,20 +132,18 @@
             id="imagen-libro"
             src=""
             alt="Imagen del libro"
-            class="img-fluid rounded"
+            class="img-fluid rounded shadow"
             style="max-width: 300px; display: none"
           />
-          <p id="precio-libro" class="fw-bold mt-2 text-danger"></p>
+          <p id="precio-libro" class="fw-bold mt-2 text-warning"></p>
         </div>
 
-        <!-- Cantidad -->
         <div class="mb-3">
           <label for="cantidad" class="form-label">Cantidad</label>
           <input
             type="number"
             class="form-control"
             id="cantidad"
-            name="cantidad"
             min="1"
             max="1000"
             value="1"
@@ -169,6 +152,8 @@
         </div>
 
         <!-- Descuento -->
+        <hr class="my-4 border-danger" />
+        <h5 class="text-danger mb-3">💳 Descuento y Pago</h5>
         <div class="mb-3">
           <label for="descuento" class="form-label">Código de descuento</label>
           <input
@@ -179,7 +164,7 @@
           />
           <button
             type="button"
-            class="btn btn-outline-danger mt-2"
+            class="btn btn-outline-light mt-2"
             id="aplicar-descuento"
           >
             Aplicar Descuento
@@ -187,10 +172,9 @@
           <p id="descuento-aplicado" class="text-success fw-bold mt-2"></p>
         </div>
 
-        <!-- Pago -->
         <div class="mb-3">
           <label for="pago" class="form-label">Método de pago</label>
-          <select class="form-select" id="pago" name="pago" required>
+          <select class="form-select" id="pago" required>
             <option value="">-- Selecciona un método --</option>
             <option value="Tarjeta de Crédito">Tarjeta de Crédito</option>
             <option value="Transferencia Bancaria">
@@ -201,8 +185,9 @@
         </div>
 
         <!-- Envío -->
+        <hr class="my-4 border-danger" />
+        <h5 class="text-danger mb-3">🚚 Envío</h5>
         <div class="mb-3">
-          <label class="form-label">Método de envío</label>
           <div class="form-check">
             <input
               type="radio"
@@ -212,7 +197,9 @@
               id="envio_expres"
               required
             />
-            <label class="form-check-label" for="envio_expres">Exprés</label>
+            <label class="form-check-label" for="envio_expres"
+              >Exprés (1 semana)</label
+            >
           </div>
           <div class="form-check">
             <input
@@ -223,14 +210,15 @@
               id="envio_estandar"
             />
             <label class="form-check-label" for="envio_estandar"
-              >Estándar</label
+              >Estándar (3 semanas)</label
             >
           </div>
+          <p id="info-envio" class="mt-2 text-info fw-bold"></p>
         </div>
 
-        <div id="info-envio" class="mt-2 text-info fw-bold"></div>
-
-        <!-- Fecha nacimiento -->
+        <!-- Extras -->
+        <hr class="my-4 border-danger" />
+        <h5 class="text-danger mb-3">🎂 Edad y Seguridad</h5>
         <div class="mb-3">
           <label for="fecha_nacimiento" class="form-label"
             >Fecha de nacimiento</label
@@ -243,7 +231,7 @@
           />
           <button
             type="button"
-            class="btn btn-outline-secondary mt-2"
+            class="btn btn-outline-danger mt-2"
             id="calcular-edad"
           >
             Calcular Edad
@@ -251,26 +239,27 @@
           <p id="resultado-edad"></p>
         </div>
 
-        <!-- Encriptar nombre -->
         <div class="mb-3">
           <button type="button" class="btn btn-warning" id="encriptar-nombre">
-            Encriptar Nombre
+            🔐 Encriptar Nombre
           </button>
           <p id="nombre-encriptado" class="mt-2"></p>
         </div>
 
-        <div class="mb-3 text-center">
+        <!-- Total -->
+        <div class="my-4 text-center">
           <h4 id="precio-final" class="text-white bg-danger p-3 rounded">
             Total a pagar: $0 CLP
           </h4>
+          <p id="precio-convertido" class="text-secondary mt-2"></p>
         </div>
 
-        <p id="precio-convertido" class="text-secondary text-center mt-2"></p>
-
         <!-- Enviar -->
-        <button type="submit" class="btn btn-danger w-100">
-          Realizar Compra
-        </button>
+        <div class="d-grid">
+          <button type="submit" class="btn btn-danger btn-lg">
+            🛒 Realizar Compra
+          </button>
+        </div>
       </form>
 
       <!-- Valores API -->

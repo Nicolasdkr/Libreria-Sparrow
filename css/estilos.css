@@ -1,16 +1,25 @@
-/* Fuente general */
 body {
-  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
-  background-color: white;
-  line-height: 1.6;
+  background-color: #f8f9fa;
 }
 
-/* Carrusel - Imágenes */
-.carousel-inner img {
-  height: 600px;
+/* Estilo personalizado para navbar rojo oscuro */
+.navbar-red {
+  background-color: #a11212 !important;
+}
+
+/* Carrusel con altura controlada */
+.carousel-item img {
+  height: 500px;
   object-fit: cover;
 }
 
+/* Estilo para secciones */
+.section-box {
+  background-color: white;
+  border-radius: 12px;
+  padding: 2rem;
+  box-shadow: 0 0 12px rgba(0, 0, 0, 0.1);
+}
 /* Imagen en sección "Quiénes somos" */
 #img-nosotros {
   width: 400px;
