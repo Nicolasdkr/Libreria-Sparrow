@@ -12,9 +12,9 @@
   </head>
   <body class="bg-dark text-white">
     <!-- Navbar -->
-    <nav class="navbar navbar-expand-lg navbar-dark bg-danger">
+    <nav class="navbar navbar-expand-lg navbar-dark bg-danger shadow">
       <div class="container-fluid">
-        <a class="navbar-brand" href="index.html">
+        <a class="navbar-brand fw-bold" href="index.html">
           <img
             src="img/logo_tienda_libros.webp"
             width="40"
@@ -26,127 +26,144 @@
       </div>
     </nav>
 
-    <!-- Sección de login -->
+    <!-- Login -->
     <div class="container my-5" id="login-section">
-      <h3 class="text-center mb-4">Acceso Administrativo</h3>
-      <div class="card p-4 bg-secondary text-white">
-        <div class="mb-3">
-          <label for="clave-admin" class="form-label">Contraseña:</label>
-          <input
-            type="password"
-            class="form-control"
-            id="clave-admin"
-            placeholder="Ingrese la clave"
-          />
+      <div class="row justify-content-center">
+        <div class="col-md-6">
+          <div class="card bg-secondary text-white p-4 shadow">
+            <h3 class="text-center mb-4">🔐 Acceso Administrativo</h3>
+            <div class="mb-3">
+              <label for="clave-admin" class="form-label">Contraseña:</label>
+              <input
+                type="password"
+                class="form-control"
+                id="clave-admin"
+                placeholder="Ingrese la clave"
+              />
+            </div>
+            <div class="d-grid">
+              <button class="btn btn-light fw-bold" onclick="verificarClave()">
+                Ingresar
+              </button>
+            </div>
+            <p id="mensaje-clave" class="mt-3 text-warning text-center"></p>
+          </div>
         </div>
-        <button class="btn btn-light" onclick="verificarClave()">
-          Ingresar
-        </button>
-        <p id="mensaje-clave" class="mt-3 text-warning"></p>
       </div>
     </div>
 
-    <!-- Panel de administración oculto -->
+    <!-- Panel de admin -->
     <div class="container my-5" id="admin-panel" style="display: none">
-      <h2 class="text-center mb-4 text-danger">Panel de Administración</h2>
+      <h2 class="text-center mb-4 text-danger">📚 Panel de Administración</h2>
 
       <!-- Gestión de Libros -->
-      <div class="card bg-secondary text-white mb-4 p-3">
-        <h4>Gestión de Libros</h4>
-        <form id="form-libro" class="row g-3">
-          <div class="col-md-4">
-            <input
-              type="text"
-              id="titulo"
-              class="form-control"
-              placeholder="Título"
-              required
-            />
-          </div>
-          <div class="col-md-4">
-            <input
-              type="text"
-              id="autor"
-              class="form-control"
-              placeholder="Autor"
-              required
-            />
-          </div>
-          <div class="col-md-2">
-            <input
-              type="number"
-              id="precio"
-              class="form-control"
-              placeholder="Precio CLP"
-              required
-            />
-          </div>
-          <div class="col-md-2 d-grid">
-            <button type="submit" class="btn btn-danger">Agregar Libro</button>
-          </div>
-        </form>
-        <table class="table table-dark table-bordered mt-4">
-          <thead>
-            <tr>
-              <th>Título</th>
-              <th>Autor</th>
-              <th>Precio</th>
-              <th>Acciones</th>
-            </tr>
-          </thead>
-          <tbody id="tabla-libros"></tbody>
-        </table>
+      <div class="card bg-dark text-white mb-4 shadow">
+        <div class="card-header border-danger border-2">
+          <h4 class="text-danger">Gestión de Libros</h4>
+        </div>
+        <div class="card-body">
+          <form id="form-libro" class="row g-3">
+            <div class="col-md-4">
+              <input
+                type="text"
+                id="titulo"
+                class="form-control"
+                placeholder="Título"
+                required
+              />
+            </div>
+            <div class="col-md-4">
+              <input
+                type="text"
+                id="autor"
+                class="form-control"
+                placeholder="Autor"
+                required
+              />
+            </div>
+            <div class="col-md-2">
+              <input
+                type="number"
+                id="precio"
+                class="form-control"
+                placeholder="Precio CLP"
+                required
+              />
+            </div>
+            <div class="col-md-2 d-grid">
+              <button type="submit" class="btn btn-danger">Agregar</button>
+            </div>
+          </form>
+
+          <table class="table table-bordered table-dark table-hover mt-4">
+            <thead class="table-danger text-center">
+              <tr>
+                <th>Título</th>
+                <th>Autor</th>
+                <th>Precio</th>
+                <th>Acciones</th>
+              </tr>
+            </thead>
+            <tbody id="tabla-libros" class="text-center"></tbody>
+          </table>
+        </div>
       </div>
 
       <!-- Gestión de Pedidos -->
-      <div class="card bg-secondary text-white p-3">
-        <h4>Gestión de Pedidos</h4>
-        <p class="text-muted">
-          Aquí podrás visualizar y editar los pedidos realizados por los
-          clientes.
-        </p>
-        <div id="lista-compras" class="mt-3"></div>
+      <div class="card bg-dark text-white shadow mb-5">
+        <div class="card-header border-success border-2">
+          <h4 class="text-success">📦 Pedidos Recibidos</h4>
+        </div>
+        <div class="card-body">
+          <p class="text-light mb-3">
+            A continuación se listan todos los pedidos realizados por los
+            clientes. Puedes revisarlos y editarlos si es necesario.
+          </p>
+          <div id="lista-compras" class="mt-3"></div>
+        </div>
       </div>
+
+      <!-- Sección API -->
+      <section class="p-4 bg-light text-dark rounded shadow">
+        <h4 class="mb-3 text-danger">💱 Valores del Día (API mindicador.cl)</h4>
+        <ul class="mb-3">
+          <li>UF: <span id="valor-uf">Cargando...</span></li>
+          <li>UTM: <span id="valor-utm">Cargando...</span></li>
+          <li>EURO: <span id="valor-euro">Cargando...</span></li>
+        </ul>
+
+        <div class="row">
+          <div class="col-md-6 mb-2">
+            <label for="convertir-monto" class="form-label"
+              >Monto en CLP:</label
+            >
+            <input
+              type="number"
+              class="form-control"
+              id="convertir-monto"
+              placeholder="Ej: 10000"
+            />
+          </div>
+          <div class="col-md-4 mb-2">
+            <label for="convertir-moneda" class="form-label"
+              >Convertir a:</label
+            >
+            <select class="form-select" id="convertir-moneda">
+              <option value="uf">UF</option>
+              <option value="utm">UTM</option>
+              <option value="euro">EURO</option>
+            </select>
+          </div>
+          <div class="col-md-2 d-flex align-items-end">
+            <button id="btn-convertir" class="btn btn-secondary w-100">
+              Convertir
+            </button>
+          </div>
+        </div>
+
+        <p id="resultado-conversion" class="mt-3 fw-bold"></p>
+      </section>
     </div>
-
-    <!-- Valores API -->
-    <section class="mt-5 p-4 bg-light border rounded">
-      <h4 class="mb-3 text-danger">Valores del Día (API mindicador.cl)</h4>
-      <ul class="mb-3">
-        <li>UF: <span id="valor-uf">Cargando...</span></li>
-        <li>UTM: <span id="valor-utm">Cargando...</span></li>
-        <li>EURO: <span id="valor-euro">Cargando...</span></li>
-      </ul>
-
-      <div class="row">
-        <div class="col-md-6 mb-2">
-          <label for="convertir-monto" class="form-label"
-            >Convertir total a otra moneda:</label
-          >
-          <input
-            type="number"
-            class="form-control"
-            id="convertir-monto"
-            placeholder="Monto en CLP"
-          />
-        </div>
-        <div class="col-md-4 mb-2">
-          <label for="convertir-moneda" class="form-label">Moneda</label>
-          <select class="form-select" id="convertir-moneda">
-            <option value="uf">UF</option>
-            <option value="utm">UTM</option>
-            <option value="euro">EURO</option>
-          </select>
-        </div>
-        <div class="col-md-2 d-flex align-items-end">
-          <button id="btn-convertir" class="btn btn-secondary w-100">
-            Convertir
-          </button>
-        </div>
-      </div>
-
-      <p id="resultado-conversion" class="mt-3 fw-bold"></p>
-    </section>
 
     <!-- Scripts -->
     <script src="js/admin.js"></script>

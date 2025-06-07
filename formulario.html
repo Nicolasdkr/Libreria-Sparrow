@@ -12,24 +12,35 @@
   </head>
   <body>
     <!-- Header -->
-    <nav class="navbar navbar-expand-lg navbar-dark bg-danger">
+    <nav class="navbar navbar-expand-lg navbar-dark navbar-red">
       <div class="container-fluid">
         <a class="navbar-brand" href="#">
           <img
             src="img/logo_tienda_libros.webp"
+            alt="Logo"
             width="40"
             class="me-2"
-            alt="Logo"
           />
           Librería Sparrow
         </a>
+        <button
+          class="navbar-toggler"
+          type="button"
+          data-bs-toggle="collapse"
+          data-bs-target="#navbarNav"
+        >
+          <span class="navbar-toggler-icon"></span>
+        </button>
         <div class="collapse navbar-collapse" id="navbarNav">
           <ul class="navbar-nav ms-auto">
             <li class="nav-item">
-              <a class="nav-link" href="index.html">Inicio</a>
+              <a class="nav-link active" href="index.html">Inicio</a>
             </li>
             <li class="nav-item">
-              <a class="nav-link" href="contacto.html">Contáctanos</a>
+              <a class="nav-link" href="#quienes-somos">?</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="formulario.html">Comprar</a>
             </li>
             <li class="nav-item">
               <a class="nav-link" href="admin.html">Admin</a>
@@ -55,7 +66,16 @@
             required
           />
         </div>
-
+        <div class="mb-3">
+          <label for="direccion" class="form-label">Dirección</label>
+          <input
+            type="text"
+            class="form-control"
+            id="direccion"
+            name="direccion"
+            required
+          />
+        </div>
         <div class="mb-3">
           <label for="rut" class="form-label">RUT</label>
           <input
@@ -128,7 +148,7 @@
             src=""
             alt="Imagen del libro"
             class="img-fluid rounded"
-            style="max-width: 200px; display: none"
+            style="max-width: 300px; display: none"
           />
           <p id="precio-libro" class="fw-bold mt-2 text-danger"></p>
         </div>
@@ -208,6 +228,8 @@
           </div>
         </div>
 
+        <div id="info-envio" class="mt-2 text-info fw-bold"></div>
+
         <!-- Fecha nacimiento -->
         <div class="mb-3">
           <label for="fecha_nacimiento" class="form-label"
@@ -253,6 +275,9 @@
 
       <!-- Valores API -->
       <section class="mt-5 p-4 bg-light border rounded">
+        <h3 class="text-center mb-3">
+          💸Combierte las monedas que quieres tu solo💸
+        </h3>
         <h4 class="mb-3 text-danger">Valores del Día (API mindicador.cl)</h4>
         <ul class="mb-3">
           <li>UF: <span id="valor-uf">Cargando...</span></li>
@@ -302,8 +327,10 @@
     </div>
 
     <!-- Footer -->
-    <footer class="bg-dark text-white text-center py-3 mt-5">
-      <p class="mb-0">&copy; 2025 Librería Sparrow</p>
+    <footer class="bg-rojo-sparrow text-white text-center py-3">
+      <div class="container-fluid">
+        <p>&copy; 2025 Librería Sparrow</p>
+      </div>
     </footer>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>

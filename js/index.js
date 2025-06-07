@@ -1,5 +1,16 @@
 document.addEventListener("DOMContentLoaded", () => {
   cargarAPI();
+  configurarEventos();
+
+  // Mostrar modal solo una vez
+  if (!localStorage.getItem("promoMostrada")) {
+    const promo = new bootstrap.Modal(document.getElementById("modalPromo"));
+    promo.show();
+    localStorage.setItem("promoMostrada", "true");
+  }
+});
+
+function configurarEventos() {
   document
     .getElementById("form-compra")
     .addEventListener("submit", guardarCompra);
@@ -24,15 +35,14 @@ document.addEventListener("DOMContentLoaded", () => {
   document
     .getElementById("aplicar-descuento")
     .addEventListener("click", calcularTotal);
-  document.querySelectorAll("input[name='envio']").forEach((radio) => {
-    radio.addEventListener("change", calcularTotal);
-  });
+  document.querySelectorAll("input[name='envio']").forEach((radio) =>
+    radio.addEventListener("change", () => {
+      actualizarEnvioTexto(radio.value);
+      calcularTotal();
+    })
+  );
+}
 
-  const modalPromo = new bootstrap.Modal(document.getElementById("modalPromo"));
-  modalPromo.show();
-});
-
-// === Validación RUT ===
 function validarRUT(rut) {
   rut = rut.replace(/\.|-/g, "");
   if (rut.length < 8) return false;
@@ -61,10 +71,23 @@ function guardarCompra(e) {
   const cantidad = parseInt(document.getElementById("cantidad").value);
   const pago = document.getElementById("pago").value;
   const envio = document.querySelector('input[name="envio"]:checked')?.value;
+  const pais = document.getElementById("pais-envio").value;
 
   if (!validarRUT(rut)) {
     alert("RUT inválido");
     return;
+  }
+
+  const hoy = new Date();
+  let fechaEntrega = new Date(hoy);
+  let costoEnvio = 0;
+
+  if (envio === "Exprés") {
+    fechaEntrega.setDate(hoy.getDate() + 7);
+    costoEnvio = 3000;
+  } else if (envio === "Estándar") {
+    fechaEntrega.setDate(hoy.getDate() + 21);
+    costoEnvio = 1500;
   }
 
   const compra = {
@@ -77,28 +100,18 @@ function guardarCompra(e) {
     cantidad,
     pago,
     envio,
-    fecha: new Date().toLocaleDateString(),
+    pais,
+    fecha: hoy.toLocaleDateString(),
+    fechaEntrega: fechaEntrega.toLocaleDateString(),
+    costoEnvio,
   };
 
-  let compras = JSON.parse(localStorage.getItem("compras")) || [];
+  const compras = JSON.parse(localStorage.getItem("compras")) || [];
   compras.push(compra);
   localStorage.setItem("compras", JSON.stringify(compras));
   mostrarResumen(compra);
   document.getElementById("form-compra").reset();
-  calcularTotal(); // actualiza total después del reset
-}
-
-function mostrarResumen(compra) {
-  const resumen = document.getElementById("resumen");
-  const lista = document.getElementById("resumen-lista");
-  lista.innerHTML = "";
-
-  for (let key in compra) {
-    const item = document.createElement("li");
-    item.textContent = `${key}: ${compra[key]}`;
-    lista.appendChild(item);
-  }
-  resumen.style.display = "block";
+  calcularTotal();
 }
 
 function calcularEdad() {
@@ -125,32 +138,56 @@ function encriptarNombre() {
   ).textContent = `Nombre encriptado: ${cifrado}`;
 }
 
-// === Mostrar imagen y precio según libro ===
 function mostrarLibro() {
   const libro = document.getElementById("libro").value;
   const imagen = document.getElementById("imagen-libro");
   const precio = document.getElementById("precio-libro");
 
-  const datos = {
-    imperio_final: { img: "img/imperio.jpg", precio: 12000 },
-    cementerio_animales: { img: "img/king.jpg", precio: 9500 },
-    nombre_del_viento: { img: "img/nombre.jpg", precio: 13500 },
-    harry_potter: { img: "img/harry.jpg", precio: 11000 },
-    lotm: { img: "img/lotm.jpg", precio: 14000 },
-    orgullo: { img: "img/orgullo.jpg", precio: 8000 },
-  };
-
-  if (libro && datos[libro]) {
-    imagen.src = datos[libro].img;
+  if (libros[libro]) {
+    imagen.src = libros[libro].imagen;
     imagen.style.display = "block";
-    precio.textContent = `Precio: $${datos[libro].precio.toLocaleString()}`;
+    precio.textContent = `Precio: $${libros[libro].precio.toLocaleString()}`;
   } else {
     imagen.style.display = "none";
     precio.textContent = "";
   }
 }
 
-// === API mindicador.cl ===
+// Libros disponibles
+const libros = {
+  imperio_final: {
+    nombre: "El Imperio Final",
+    precio: 12000,
+    imagen: "img/portadas_libros/imperio_final.jpg",
+  },
+  cementerio_animales: {
+    nombre: "Cementerio de Animales",
+    precio: 9500,
+    imagen: "img/portadas_libros/cementerio_de_animales.jpg",
+  },
+  nombre_del_viento: {
+    nombre: "El Nombre del Viento",
+    precio: 13500,
+    imagen: "img/portadas_libros/nombre_del_viento.jpg",
+  },
+  harry_potter: {
+    nombre: "Harry Potter",
+    precio: 11000,
+    imagen: "img/portadas_libros/harry_potter.jpg",
+  },
+  lotm: {
+    nombre: "Lord of the Mysteries",
+    precio: 14000,
+    imagen: "img/portadas_libros/lotm.jpg",
+  },
+  orgullo: {
+    nombre: "Orgullo y Prejuicio",
+    precio: 8000,
+    imagen: "img/portadas_libros/orgullo.jpg",
+  },
+};
+
+// === API de indicadores ===
 let indicadores = {};
 async function cargarAPI() {
   try {
@@ -163,13 +200,13 @@ async function cargarAPI() {
     };
     document.getElementById(
       "valor-uf"
-    ).textContent = `$${indicadores.uf.toLocaleString()}`;
+    ).textContent = `$${data.uf.valor.toLocaleString()}`;
     document.getElementById(
       "valor-utm"
-    ).textContent = `$${indicadores.utm.toLocaleString()}`;
+    ).textContent = `$${data.utm.valor.toLocaleString()}`;
     document.getElementById(
       "valor-euro"
-    ).textContent = `$${indicadores.euro.toLocaleString()}`;
+    ).textContent = `$${data.euro.valor.toLocaleString()}`;
   } catch (error) {
     console.error("Error cargando API:", error);
   }
@@ -185,17 +222,8 @@ function convertirMoneda() {
   ).textContent = `${resultado} ${tipo.toUpperCase()}`;
 }
 
-// === Calcular total final ===
+// === Cálculo de total ===
 function calcularTotal() {
-  const precios = {
-    imperio_final: 12000,
-    cementerio_animales: 9500,
-    nombre_del_viento: 13500,
-    harry_potter: 11000,
-    lotm: 14000,
-    orgullo: 8000,
-  };
-
   const libro = document.getElementById("libro").value;
   const cantidad = parseInt(document.getElementById("cantidad").value) || 1;
   const envio = document.querySelector("input[name='envio']:checked");
@@ -203,9 +231,9 @@ function calcularTotal() {
     .getElementById("descuento")
     .value.trim()
     .toUpperCase();
+  const pais = document.getElementById("pais-envio").value;
   const mostrarTotal = document.getElementById("precio-final");
   const mensajeDescuento = document.getElementById("descuento-aplicado");
-  const monedaDestino = document.getElementById("pais-envio").value;
   const mostrarConvertido = document.getElementById("precio-convertido");
 
   if (!libro || !envio) {
@@ -215,7 +243,7 @@ function calcularTotal() {
     return;
   }
 
-  let total = precios[libro] * cantidad;
+  let total = libros[libro].precio * cantidad;
   total += envio.value === "Exprés" ? 3000 : 1500;
 
   if (descuento === "FANTASIA10") {
@@ -229,21 +257,95 @@ function calcularTotal() {
     total
   ).toLocaleString()} CLP`;
 
-  // Mostrar total en moneda del país
-  if (monedaDestino && indicadores[monedaDestino.toLowerCase()]) {
-    const tasa = indicadores[monedaDestino.toLowerCase()];
-    const convertido = (total / tasa).toFixed(2);
-    mostrarConvertido.textContent = `≈ ${convertido.toLocaleString()} ${monedaDestino}`;
+  if (pais && pais !== "CLP") {
+    const tipo = pais.toLowerCase();
+    const tasa = indicadores[tipo];
+    if (tasa) {
+      const convertido = (total / tasa).toFixed(2);
+      mostrarConvertido.textContent = `≈ ${convertido.toLocaleString()} ${pais}`;
+    }
   } else {
     mostrarConvertido.textContent = "";
   }
 }
 
-// Mostrar modal solo la primera vez
-document.addEventListener("DOMContentLoaded", function () {
-  if (!localStorage.getItem("promoMostrada")) {
-    const promo = new bootstrap.Modal(document.getElementById("modalPromo"));
-    promo.show();
-    localStorage.setItem("promoMostrada", "true");
+function actualizarEnvioTexto(valor) {
+  const infoEnvio = document.getElementById("info-envio");
+  const hoy = new Date();
+  const fecha = new Date(hoy);
+  let mensaje = "";
+
+  if (valor === "Exprés") {
+    fecha.setDate(hoy.getDate() + 7);
+    mensaje = `Tu pedido llegará en aproximadamente 1 semana (${fecha.toLocaleDateString()}).`;
+  } else {
+    fecha.setDate(hoy.getDate() + 21);
+    mensaje = `Tu pedido llegará en aproximadamente 3 semanas (${fecha.toLocaleDateString()}).`;
   }
-});
+
+  infoEnvio.textContent = mensaje;
+  infoEnvio.style.color = "blue";
+}
+
+// === Resumen ===
+function mostrarResumen(compra) {
+  const resumen = document.getElementById("resumen");
+  const lista = document.getElementById("resumen-lista");
+  lista.innerHTML = "";
+
+  const datos = [
+    { etiqueta: "Nombre", valor: compra.nombre },
+    { etiqueta: "RUT", valor: compra.rut },
+    { etiqueta: "Email", valor: compra.email },
+    { etiqueta: "Teléfono", valor: compra.telefono },
+    { etiqueta: "Dirección", valor: compra.direccion },
+    { etiqueta: "Libro", valor: formatearLibro(compra.libro) },
+    { etiqueta: "Cantidad", valor: compra.cantidad },
+    { etiqueta: "Método de Pago", valor: compra.pago },
+    { etiqueta: "Tipo de Envío", valor: compra.envio },
+    { etiqueta: "País", valor: compra.pais },
+    { etiqueta: "Fecha de Compra", valor: compra.fecha },
+  ];
+
+  datos.forEach((d) => {
+    const item = document.createElement("li");
+    item.innerHTML = `<strong>${d.etiqueta}:</strong> ${d.valor}`;
+    lista.appendChild(item);
+  });
+
+  const precioLibro = libros[compra.libro]?.precio || 0;
+  const totalLibros = precioLibro * compra.cantidad;
+  const totalFinal = totalLibros + (compra.costoEnvio || 0);
+
+  const extras = [
+    {
+      etiqueta: "Entrega Estimada",
+      valor: `${compra.envio} - ${compra.fechaEntrega}`,
+    },
+    {
+      etiqueta: "Costo de Envío",
+      valor: `$${(compra.costoEnvio || 0).toLocaleString()}`,
+    },
+    { etiqueta: "Total a Pagar", valor: `$${totalFinal.toLocaleString()}` },
+  ];
+
+  extras.forEach((d) => {
+    const item = document.createElement("li");
+    item.innerHTML = `<strong>${d.etiqueta}:</strong> ${d.valor}`;
+    lista.appendChild(item);
+  });
+
+  resumen.style.display = "block";
+}
+
+function formatearLibro(valor) {
+  const libros = {
+    imperio_final: "El Imperio Final - $12.000",
+    cementerio_animales: "Cementerio de Animales - $9.500",
+    nombre_del_viento: "El Nombre del Viento - $13.500",
+    harry_potter: "Harry Potter - $11.000",
+    lotm: "Lord of the Mysteries - $14.000",
+    orgullo: "Orgullo y Prejuicio - $8.000",
+  };
+  return libros[valor] || valor;
+}
