@@ -1,39 +1,155 @@
-<!-- admin.html - Página del administrador -->
 <!DOCTYPE html>
 <html lang="es">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Admin - Libros y Pedidos</title>
-    <link rel="stylesheet" href="style.css" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Panel de Admin - Librería Sparrow</title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="css/estilos.css" />
   </head>
-  <body>
-    <h1>Administrador de Libros</h1>
-    <form id="formLibro">
-      <input type="hidden" id="indiceLibro" />
+  <body class="bg-dark text-white">
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-danger">
+      <div class="container-fluid">
+        <a class="navbar-brand" href="index.html">
+          <img
+            src="img/logo_tienda_libros.webp"
+            width="40"
+            class="me-2"
+            alt="Logo"
+          />
+          Librería Sparrow - Admin
+        </a>
+      </div>
+    </nav>
 
-      <label for="titulo">Título:</label>
-      <input type="text" id="titulo" required />
+    <!-- Sección de login -->
+    <div class="container my-5" id="login-section">
+      <h3 class="text-center mb-4">Acceso Administrativo</h3>
+      <div class="card p-4 bg-secondary text-white">
+        <div class="mb-3">
+          <label for="clave-admin" class="form-label">Contraseña:</label>
+          <input
+            type="password"
+            class="form-control"
+            id="clave-admin"
+            placeholder="Ingrese la clave"
+          />
+        </div>
+        <button class="btn btn-light" onclick="verificarClave()">
+          Ingresar
+        </button>
+        <p id="mensaje-clave" class="mt-3 text-warning"></p>
+      </div>
+    </div>
 
-      <label for="autor">Autor:</label>
-      <input type="text" id="autor" required />
+    <!-- Panel de administración oculto -->
+    <div class="container my-5" id="admin-panel" style="display: none">
+      <h2 class="text-center mb-4 text-danger">Panel de Administración</h2>
 
-      <label for="precio">Precio:</label>
-      <input type="number" id="precio" required />
+      <!-- Gestión de Libros -->
+      <div class="card bg-secondary text-white mb-4 p-3">
+        <h4>Gestión de Libros</h4>
+        <form id="form-libro" class="row g-3">
+          <div class="col-md-4">
+            <input
+              type="text"
+              id="titulo"
+              class="form-control"
+              placeholder="Título"
+              required
+            />
+          </div>
+          <div class="col-md-4">
+            <input
+              type="text"
+              id="autor"
+              class="form-control"
+              placeholder="Autor"
+              required
+            />
+          </div>
+          <div class="col-md-2">
+            <input
+              type="number"
+              id="precio"
+              class="form-control"
+              placeholder="Precio CLP"
+              required
+            />
+          </div>
+          <div class="col-md-2 d-grid">
+            <button type="submit" class="btn btn-danger">Agregar Libro</button>
+          </div>
+        </form>
+        <table class="table table-dark table-bordered mt-4">
+          <thead>
+            <tr>
+              <th>Título</th>
+              <th>Autor</th>
+              <th>Precio</th>
+              <th>Acciones</th>
+            </tr>
+          </thead>
+          <tbody id="tabla-libros"></tbody>
+        </table>
+      </div>
 
-      <label for="imagen">Imagen (URL):</label>
-      <input type="text" id="imagen" />
+      <!-- Gestión de Pedidos -->
+      <div class="card bg-secondary text-white p-3">
+        <h4>Gestión de Pedidos</h4>
+        <p class="text-muted">
+          Aquí podrás visualizar y editar los pedidos realizados por los
+          clientes.
+        </p>
+        <div id="lista-compras" class="mt-3"></div>
+      </div>
+    </div>
 
-      <button type="submit">Guardar Libro</button>
-    </form>
+    <!-- Valores API -->
+    <section class="mt-5 p-4 bg-light border rounded">
+      <h4 class="mb-3 text-danger">Valores del Día (API mindicador.cl)</h4>
+      <ul class="mb-3">
+        <li>UF: <span id="valor-uf">Cargando...</span></li>
+        <li>UTM: <span id="valor-utm">Cargando...</span></li>
+        <li>EURO: <span id="valor-euro">Cargando...</span></li>
+      </ul>
 
-    <h2>Lista de Libros</h2>
-    <div id="listaLibros"></div>
+      <div class="row">
+        <div class="col-md-6 mb-2">
+          <label for="convertir-monto" class="form-label"
+            >Convertir total a otra moneda:</label
+          >
+          <input
+            type="number"
+            class="form-control"
+            id="convertir-monto"
+            placeholder="Monto en CLP"
+          />
+        </div>
+        <div class="col-md-4 mb-2">
+          <label for="convertir-moneda" class="form-label">Moneda</label>
+          <select class="form-select" id="convertir-moneda">
+            <option value="uf">UF</option>
+            <option value="utm">UTM</option>
+            <option value="euro">EURO</option>
+          </select>
+        </div>
+        <div class="col-md-2 d-flex align-items-end">
+          <button id="btn-convertir" class="btn btn-secondary w-100">
+            Convertir
+          </button>
+        </div>
+      </div>
 
-    <h1>Administrador de Pedidos</h1>
-    <div id="listaPedidos"></div>
+      <p id="resultado-conversion" class="mt-3 fw-bold"></p>
+    </section>
 
-    <script src="utils.js"></script>
-    <script src="script.js"></script>
+    <!-- Scripts -->
+    <script src="js/admin.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
   </body>
 </html>

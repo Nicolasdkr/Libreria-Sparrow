@@ -12,7 +12,24 @@ document.addEventListener("DOMContentLoaded", () => {
   document
     .getElementById("btn-convertir")
     .addEventListener("click", convertirMoneda);
-  document.getElementById("libro").addEventListener("change", mostrarLibro);
+  document
+    .getElementById("pais-envio")
+    .addEventListener("change", calcularTotal);
+  document.getElementById("libro").addEventListener("change", () => {
+    mostrarLibro();
+    calcularTotal();
+  });
+  document.getElementById("cantidad").addEventListener("input", calcularTotal);
+  document.getElementById("descuento").addEventListener("input", calcularTotal);
+  document
+    .getElementById("aplicar-descuento")
+    .addEventListener("click", calcularTotal);
+  document.querySelectorAll("input[name='envio']").forEach((radio) => {
+    radio.addEventListener("change", calcularTotal);
+  });
+
+  const modalPromo = new bootstrap.Modal(document.getElementById("modalPromo"));
+  modalPromo.show();
 });
 
 // === Validación RUT ===
@@ -21,7 +38,6 @@ function validarRUT(rut) {
   if (rut.length < 8) return false;
   let cuerpo = rut.slice(0, -1);
   let dv = rut.slice(-1).toUpperCase();
-
   let suma = 0,
     multiplo = 2;
   for (let i = cuerpo.length - 1; i >= 0; i--) {
@@ -69,6 +85,7 @@ function guardarCompra(e) {
   localStorage.setItem("compras", JSON.stringify(compras));
   mostrarResumen(compra);
   document.getElementById("form-compra").reset();
+  calcularTotal(); // actualiza total después del reset
 }
 
 function mostrarResumen(compra) {
@@ -167,3 +184,66 @@ function convertirMoneda() {
     "resultado-conversion"
   ).textContent = `${resultado} ${tipo.toUpperCase()}`;
 }
+
+// === Calcular total final ===
+function calcularTotal() {
+  const precios = {
+    imperio_final: 12000,
+    cementerio_animales: 9500,
+    nombre_del_viento: 13500,
+    harry_potter: 11000,
+    lotm: 14000,
+    orgullo: 8000,
+  };
+
+  const libro = document.getElementById("libro").value;
+  const cantidad = parseInt(document.getElementById("cantidad").value) || 1;
+  const envio = document.querySelector("input[name='envio']:checked");
+  const descuento = document
+    .getElementById("descuento")
+    .value.trim()
+    .toUpperCase();
+  const mostrarTotal = document.getElementById("precio-final");
+  const mensajeDescuento = document.getElementById("descuento-aplicado");
+  const monedaDestino = document.getElementById("pais-envio").value;
+  const mostrarConvertido = document.getElementById("precio-convertido");
+
+  if (!libro || !envio) {
+    mostrarTotal.textContent = "Total a pagar: $0 CLP";
+    mensajeDescuento.textContent = "";
+    mostrarConvertido.textContent = "";
+    return;
+  }
+
+  let total = precios[libro] * cantidad;
+  total += envio.value === "Exprés" ? 3000 : 1500;
+
+  if (descuento === "FANTASIA10") {
+    total *= 0.9;
+    mensajeDescuento.textContent = "✅ Descuento aplicado (10%)";
+  } else {
+    mensajeDescuento.textContent = "";
+  }
+
+  mostrarTotal.textContent = `Total a pagar: $${Math.round(
+    total
+  ).toLocaleString()} CLP`;
+
+  // Mostrar total en moneda del país
+  if (monedaDestino && indicadores[monedaDestino.toLowerCase()]) {
+    const tasa = indicadores[monedaDestino.toLowerCase()];
+    const convertido = (total / tasa).toFixed(2);
+    mostrarConvertido.textContent = `≈ ${convertido.toLocaleString()} ${monedaDestino}`;
+  } else {
+    mostrarConvertido.textContent = "";
+  }
+}
+
+// Mostrar modal solo la primera vez
+document.addEventListener("DOMContentLoaded", function () {
+  if (!localStorage.getItem("promoMostrada")) {
+    const promo = new bootstrap.Modal(document.getElementById("modalPromo"));
+    promo.show();
+    localStorage.setItem("promoMostrada", "true");
+  }
+});
