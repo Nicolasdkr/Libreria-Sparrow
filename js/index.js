@@ -55,21 +55,58 @@ function validarRUT(rut) {
 function guardarCompra(e) {
   e.preventDefault();
 
-  const nombre = document.getElementById("nombre").value;
-  const rut = document.getElementById("rut").value;
-  const email = document.getElementById("email").value;
-  const telefono = document.getElementById("telefono").value;
-  const direccion = document.getElementById("direccion").value;
+  const nombre = document.getElementById("nombre").value.trim();
+  const rut = document.getElementById("rut").value.trim();
+  const email = document.getElementById("email").value.trim();
+  const telefono = document.getElementById("telefono").value.trim();
+  const direccion = document.getElementById("direccion").value.trim();
   const libro = document.getElementById("libro").value;
   const cantidad = parseInt(document.getElementById("cantidad").value);
   const pago = document.getElementById("pago").value;
   const envio = document.querySelector('input[name="envio"]:checked')?.value;
   const pais = document.getElementById("pais-envio").value;
+  const fechaNacimiento = document.getElementById("fecha_nacimiento").value;
+
+  // === VALIDACIONES ===
+
+  if (nombre.length < 10) {
+    alert("El nombre debe tener al menos 10 caracteres.");
+    return;
+  }
+
+  if (direccion.length < 5) {
+    alert("La dirección debe tener al menos 5 caracteres.");
+    return;
+  }
 
   if (!validarRUT(rut)) {
     alert("RUT inválido");
     return;
   }
+
+  if (!validarEmail(email)) {
+    alert("Correo electrónico inválido.");
+    return;
+  }
+
+  if (!validarTelefonoChileno(telefono)) {
+    alert(
+      "El número de teléfono debe comenzar con +569 y tener 12 dígitos en total."
+    );
+    return;
+  }
+
+  if (isNaN(cantidad) || cantidad < 1 || cantidad > 1000) {
+    alert("Debes pedir al menos 1 libro y como máximo 1000.");
+    return;
+  }
+
+  if (!fechaNacimiento || !mayorDeEdad(fechaNacimiento)) {
+    alert("Debes ser mayor de 18 años para realizar una compra.");
+    return;
+  }
+
+  // === SI TODO ES VÁLIDO, CONTINÚA ===
 
   const hoy = new Date();
   let fechaEntrega = new Date(hoy);
@@ -83,8 +120,14 @@ function guardarCompra(e) {
     costoEnvio = 1500;
   }
 
+  const precioUnitario = libros[libro]?.precio || 0;
+  const totalLibros = precioUnitario * cantidad;
+  const totalFinal = totalLibros + costoEnvio;
+  const nombreEncriptado = btoa(nombre);
+
   const compra = {
     nombre,
+    nombreEncriptado,
     rut,
     email,
     telefono,
@@ -97,11 +140,14 @@ function guardarCompra(e) {
     fecha: hoy.toLocaleDateString(),
     fechaEntrega: fechaEntrega.toLocaleDateString(),
     costoEnvio,
+    precioUnitario,
+    totalFinal,
   };
 
   const compras = JSON.parse(localStorage.getItem("compras")) || [];
   compras.push(compra);
   localStorage.setItem("compras", JSON.stringify(compras));
+
   mostrarResumen(compra);
   document.getElementById("form-compra").reset();
   calcularTotal();
@@ -341,4 +387,26 @@ function formatearLibro(valor) {
     orgullo: "Orgullo y Prejuicio - $8.000",
   };
   return libros[valor] || valor;
+}
+
+function validarEmail(email) {
+  const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  return regex.test(email);
+}
+
+function validarTelefonoChileno(telefono) {
+  return /^\+569\d{8}$/.test(telefono);
+}
+
+function mayorDeEdad(fechaStr) {
+  const nacimiento = new Date(fechaStr);
+  const hoy = new Date();
+  let edad = hoy.getFullYear() - nacimiento.getFullYear();
+  const mes = hoy.getMonth() - nacimiento.getMonth();
+
+  if (mes < 0 || (mes === 0 && hoy.getDate() < nacimiento.getDate())) {
+    edad--;
+  }
+
+  return edad >= 18;
 }

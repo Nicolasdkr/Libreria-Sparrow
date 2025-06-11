@@ -1,45 +1,154 @@
-// === 1. Contraseña para entrar ===
-const CLAVE_CORRECTA = "admin123";
+// admin.js actualizado para el Panel de Administración
+
+document.addEventListener("DOMContentLoaded", () => {
+  document
+    .getElementById("btn-convertir")
+    .addEventListener("click", convertirMoneda);
+  document
+    .getElementById("form-libro")
+    .addEventListener("submit", agregarLibro);
+  cargarAPI();
+  cargarCompras();
+  cargarLibros();
+});
 
 function verificarClave() {
   const clave = document.getElementById("clave-admin").value;
   const mensaje = document.getElementById("mensaje-clave");
 
-  if (clave === CLAVE_CORRECTA) {
+  if (clave.trim() === "admin123") {
     document.getElementById("login-section").style.display = "none";
     document.getElementById("admin-panel").style.display = "block";
-    renderLibros();
-    mostrarCompras();
-    cargarAPI();
   } else {
-    mensaje.textContent = "⚠️ Clave incorrecta. Inténtalo de nuevo.";
+    mensaje.textContent = "⚠️ Clave incorrecta";
   }
 }
 
-// === 2. CRUD de libros ===
-let libros = JSON.parse(localStorage.getItem("libros")) || [];
+function cargarCompras() {
+  const lista = document.getElementById("lista-compras");
+  lista.innerHTML = "";
 
-function renderLibros() {
-  const tbody = document.getElementById("tabla-libros");
-  tbody.innerHTML = "";
+  const compras = JSON.parse(localStorage.getItem("compras")) || [];
 
-  libros.forEach((libro, index) => {
-    const fila = `
-      <tr>
-        <td>${libro.titulo}</td>
-        <td>${libro.autor}</td>
-        <td>$${parseInt(libro.precio).toLocaleString()}</td>
-        <td>
-          <button class="btn btn-sm btn-warning me-2" onclick="editarLibro(${index})">✏️</button>
-          <button class="btn btn-sm btn-danger" onclick="eliminarLibro(${index})">🗑️</button>
-        </td>
-      </tr>
+  if (compras.length === 0) {
+    lista.innerHTML = "<p class='text-muted'>No hay pedidos registrados.</p>";
+    return;
+  }
+
+  compras.forEach((compra, index) => {
+    const totalCalculado =
+      (compra.precioUnitario || 0) * (compra.cantidad || 1) +
+      (compra.costoEnvio || 0);
+
+    const card = document.createElement("div");
+    card.className = "card text-dark bg-light mb-4 shadow-sm";
+
+    const cardBody = `
+      <div class="card-body">
+        <h5 class="card-title">📦 Pedido de ${compra.nombre}</h5>
+        <p><strong>Nombre encriptado:</strong> <code>${
+          compra.nombreEncriptado || "-"
+        }</code></p>
+        <p><strong>RUT:</strong> ${compra.rut}</p>
+        <p><strong>Email:</strong> ${compra.email}</p>
+        <p><strong>Teléfono:</strong> ${compra.telefono}</p>
+        <p><strong>Dirección:</strong>
+          <input type="text" class="form-control mb-2" value="${
+            compra.direccion
+          }" id="direccion-${index}">
+        </p>
+        <p><strong>Libro:</strong> ${compra.libro}</p>
+        <p><strong>Cantidad:</strong> ${compra.cantidad}</p>
+        <p><strong>Precio Unitario:</strong> $${(
+          compra.precioUnitario || 0
+        ).toLocaleString()}</p>
+        <p><strong>Método de pago:</strong>
+          <input type="text" class="form-control mb-2" value="${
+            compra.pago
+          }" id="pago-${index}">
+        </p>
+        <p><strong>Tipo de envío:</strong> ${compra.envio}</p>
+        <p><strong>Costo de envío:</strong> $${(
+          compra.costoEnvio || 0
+        ).toLocaleString()}</p>
+        <p><strong>País:</strong> ${compra.pais}</p>
+        <p><strong>Fecha de compra:</strong> ${compra.fecha}</p>
+        <p><strong>Fecha estimada de entrega:</strong> ${
+          compra.fechaEntrega
+        }</p>
+        <p class="fw-bold text-success">💰 Total a pagar: $${totalCalculado.toLocaleString()} CLP</p>
+
+        <div class="d-flex justify-content-end gap-2 mt-3">
+          <button class="btn btn-success btn-sm" onclick="guardarEdicion(${index})">Guardar</button>
+          <button class="btn btn-danger btn-sm" onclick="eliminarCompra(${index})">Eliminar</button>
+        </div>
+      </div>
     `;
-    tbody.innerHTML += fila;
+
+    card.innerHTML = cardBody;
+    lista.appendChild(card);
   });
 }
 
-document.getElementById("form-libro").addEventListener("submit", function (e) {
+function guardarEdicion(index) {
+  const compras = JSON.parse(localStorage.getItem("compras")) || [];
+
+  compras[index].direccion = document.getElementById(
+    `direccion-${index}`
+  ).value;
+  compras[index].pago = document.getElementById(`pago-${index}`).value;
+
+  localStorage.setItem("compras", JSON.stringify(compras));
+  alert("✅ Pedido actualizado correctamente.");
+  cargarCompras();
+}
+
+function eliminarCompra(index) {
+  const compras = JSON.parse(localStorage.getItem("compras")) || [];
+  if (confirm("¿Estás seguro de que deseas eliminar este pedido?")) {
+    compras.splice(index, 1);
+    localStorage.setItem("compras", JSON.stringify(compras));
+    cargarCompras();
+  }
+}
+
+// API moneda
+let indicadores = {};
+async function cargarAPI() {
+  try {
+    const res = await fetch("https://mindicador.cl/api");
+    const data = await res.json();
+    indicadores = {
+      uf: data.uf.valor,
+      utm: data.utm.valor,
+      euro: data.euro.valor,
+    };
+    document.getElementById(
+      "valor-uf"
+    ).textContent = `$${indicadores.uf.toLocaleString()}`;
+    document.getElementById(
+      "valor-utm"
+    ).textContent = `$${indicadores.utm.toLocaleString()}`;
+    document.getElementById(
+      "valor-euro"
+    ).textContent = `$${indicadores.euro.toLocaleString()}`;
+  } catch (error) {
+    console.error("Error cargando API:", error);
+  }
+}
+
+function convertirMoneda() {
+  const monto = parseFloat(document.getElementById("convertir-monto").value);
+  const tipo = document.getElementById("convertir-moneda").value;
+  if (!monto || !indicadores[tipo]) return;
+  const resultado = (monto / indicadores[tipo]).toFixed(2);
+  document.getElementById(
+    "resultado-conversion"
+  ).textContent = `${resultado} ${tipo.toUpperCase()}`;
+}
+
+// Gestión de libros
+function agregarLibro(e) {
   e.preventDefault();
 
   const titulo = document.getElementById("titulo").value.trim();
@@ -48,121 +157,40 @@ document.getElementById("form-libro").addEventListener("submit", function (e) {
 
   if (!titulo || !autor || !precio) return;
 
-  libros.push({ titulo, autor, precio });
+  const nuevoLibro = { titulo, autor, precio };
+  const libros = JSON.parse(localStorage.getItem("libros")) || [];
+  libros.push(nuevoLibro);
   localStorage.setItem("libros", JSON.stringify(libros));
-  renderLibros();
-  this.reset();
-});
 
-function eliminarLibro(index) {
-  libros.splice(index, 1);
-  localStorage.setItem("libros", JSON.stringify(libros));
-  renderLibros();
+  document.getElementById("form-libro").reset();
+  cargarLibros();
 }
 
-function editarLibro(index) {
-  const libro = libros[index];
-  document.getElementById("titulo").value = libro.titulo;
-  document.getElementById("autor").value = libro.autor;
-  document.getElementById("precio").value = libro.precio;
-  eliminarLibro(index);
-}
+function cargarLibros() {
+  const tabla = document.getElementById("tabla-libros");
+  tabla.innerHTML = "";
 
-// === 3. Mostrar compras realizadas ===
-function mostrarCompras() {
-  const lista = document.getElementById("lista-compras");
-  const compras = JSON.parse(localStorage.getItem("compras")) || [];
+  const libros = JSON.parse(localStorage.getItem("libros")) || [];
 
-  if (compras.length === 0) {
-    lista.innerHTML = "<p class='text-muted'>No hay compras registradas.</p>";
-    return;
-  }
-
-  lista.innerHTML = "";
-
-  compras.forEach((compra, i) => {
-    const card = document.createElement("div");
-    card.className = "card bg-secondary text-white mb-3 shadow";
-
-    card.innerHTML = `
-      <div class="card-body">
-        <h5 class="card-title">📘 ${formatearLibro(compra.libro)} x${
-      compra.cantidad
-    }</h5>
-        <p class="card-text mb-1"><strong>Cliente:</strong> ${compra.nombre}</p>
-        <p class="card-text mb-1"><strong>RUT:</strong> ${compra.rut}</p>
-        <p class="card-text mb-1"><strong>Email:</strong> ${compra.email}</p>
-        <p class="card-text mb-1"><strong>Teléfono:</strong> ${
-          compra.telefono
-        }</p>
-        <p class="card-text mb-1"><strong>Dirección:</strong> ${
-          compra.direccion || "(sin datos)"
-        }</p>
-        <p class="card-text mb-1"><strong>Envío:</strong> ${compra.envio} - ${
-      compra.fechaEntrega
-    }</p>
-        <p class="card-text mb-1"><strong>Método de pago:</strong> ${
-          compra.pago
-        }</p>
-        <p class="card-text mb-1"><strong>País:</strong> ${compra.pais}</p>
-        <p class="card-text"><strong>Fecha de compra:</strong> ${
-          compra.fecha
-        }</p>
-      </div>
+  libros.forEach((libro, index) => {
+    const fila = document.createElement("tr");
+    fila.innerHTML = `
+      <td>${libro.titulo}</td>
+      <td>${libro.autor}</td>
+      <td>$${libro.precio.toLocaleString()}</td>
+      <td>
+        <button class="btn btn-sm btn-danger" onclick="eliminarLibro(${index})">Eliminar</button>
+      </td>
     `;
-    lista.appendChild(card);
+    tabla.appendChild(fila);
   });
 }
 
-function formatearLibro(valor) {
-  const libros = {
-    imperio_final: "El Imperio Final",
-    cementerio_animales: "Cementerio de Animales",
-    nombre_del_viento: "El Nombre del Viento",
-    harry_potter: "Harry Potter",
-    lotm: "Lord of the Mysteries",
-    orgullo: "Orgullo y Prejuicio",
-  };
-  return libros[valor] || valor;
-}
-
-// === 4. API de indicadores ===
-let indicadores = {};
-
-async function cargarAPI() {
-  try {
-    const res = await fetch("https://mindicador.cl/api");
-    const data = await res.json();
-
-    indicadores = {
-      uf: data.uf.valor,
-      utm: data.utm.valor,
-      euro: data.euro.valor,
-    };
-
-    document.getElementById(
-      "valor-uf"
-    ).textContent = `$${data.uf.valor.toLocaleString()}`;
-    document.getElementById(
-      "valor-utm"
-    ).textContent = `$${data.utm.valor.toLocaleString()}`;
-    document.getElementById(
-      "valor-euro"
-    ).textContent = `$${data.euro.valor.toLocaleString()}`;
-  } catch (error) {
-    console.error("Error cargando API:", error);
+function eliminarLibro(index) {
+  const libros = JSON.parse(localStorage.getItem("libros")) || [];
+  if (confirm("¿Seguro que deseas eliminar este libro?")) {
+    libros.splice(index, 1);
+    localStorage.setItem("libros", JSON.stringify(libros));
+    cargarLibros();
   }
 }
-
-// === 5. Conversión de monedas ===
-document.getElementById("btn-convertir").addEventListener("click", () => {
-  const monto = parseFloat(document.getElementById("convertir-monto").value);
-  const tipo = document.getElementById("convertir-moneda").value;
-
-  if (!monto || !indicadores[tipo]) return;
-
-  const resultado = (monto / indicadores[tipo]).toFixed(2);
-  document.getElementById(
-    "resultado-conversion"
-  ).textContent = `${resultado} ${tipo.toUpperCase()}`;
-});
