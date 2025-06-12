@@ -1,5 +1,3 @@
-// admin.js actualizado para el Panel de Administración
-
 document.addEventListener("DOMContentLoaded", () => {
   document
     .getElementById("btn-convertir")
@@ -12,6 +10,9 @@ document.addEventListener("DOMContentLoaded", () => {
   cargarLibros();
 });
 
+let indiceEdicion = null;
+
+// Clave de acceso
 function verificarClave() {
   const clave = document.getElementById("clave-admin").value;
   const mensaje = document.getElementById("mensaje-clave");
@@ -24,6 +25,112 @@ function verificarClave() {
   }
 }
 
+// API moneda
+let indicadores = {};
+async function cargarAPI() {
+  try {
+    const res = await fetch("https://mindicador.cl/api");
+    const data = await res.json();
+    indicadores = {
+      uf: data.uf.valor,
+      utm: data.utm.valor,
+      euro: data.euro.valor,
+    };
+    document.getElementById(
+      "valor-uf"
+    ).textContent = `$${indicadores.uf.toLocaleString()}`;
+    document.getElementById(
+      "valor-utm"
+    ).textContent = `$${indicadores.utm.toLocaleString()}`;
+    document.getElementById(
+      "valor-euro"
+    ).textContent = `$${indicadores.euro.toLocaleString()}`;
+  } catch (error) {
+    console.error("Error cargando API:", error);
+  }
+}
+
+function convertirMoneda() {
+  const monto = parseFloat(document.getElementById("convertir-monto").value);
+  const tipo = document.getElementById("convertir-moneda").value;
+  if (!monto || !indicadores[tipo]) return;
+  const resultado = (monto / indicadores[tipo]).toFixed(2);
+  document.getElementById(
+    "resultado-conversion"
+  ).textContent = `${resultado} ${tipo.toUpperCase()}`;
+}
+
+// Gestión de libros
+function agregarLibro(e) {
+  e.preventDefault();
+
+  const titulo = document.getElementById("titulo").value.trim();
+  const autor = document.getElementById("autor").value.trim();
+  const precio = parseInt(document.getElementById("precio").value);
+
+  if (!titulo || !autor || isNaN(precio)) return;
+
+  const libros = JSON.parse(localStorage.getItem("libros")) || [];
+
+  if (indiceEdicion !== null) {
+    libros[indiceEdicion] = { titulo, autor, precio };
+    indiceEdicion = null;
+    document.querySelector("#form-libro button[type='submit']").textContent =
+      "Agregar";
+  } else {
+    libros.push({ titulo, autor, precio });
+  }
+
+  localStorage.setItem("libros", JSON.stringify(libros));
+  document.getElementById("form-libro").reset();
+  cargarLibros();
+}
+
+function cargarLibros() {
+  const tabla = document.getElementById("tabla-libros");
+  tabla.innerHTML = "";
+
+  const libros = JSON.parse(localStorage.getItem("libros")) || [];
+
+  libros.forEach((libro, index) => {
+    const fila = document.createElement("tr");
+    fila.innerHTML = `
+      <td>${libro.titulo}</td>
+      <td>${libro.autor}</td>
+      <td>$${libro.precio.toLocaleString()}</td>
+      <td class="d-flex gap-2 justify-content-center">
+        <button class="btn btn-sm btn-warning" onclick="editarLibro(${index})">Editar</button>
+        <button class="btn btn-sm btn-danger" onclick="eliminarLibro(${index})">Eliminar</button>
+      </td>
+    `;
+    tabla.appendChild(fila);
+  });
+}
+
+function editarLibro(index) {
+  const libros = JSON.parse(localStorage.getItem("libros")) || [];
+  const libro = libros[index];
+
+  document.getElementById("titulo").value = libro.titulo;
+  document.getElementById("autor").value = libro.autor;
+  document.getElementById("precio").value = libro.precio;
+
+  indiceEdicion = index;
+
+  document.querySelector("#form-libro button[type='submit']").textContent =
+    "Guardar Cambios";
+}
+
+function eliminarLibro(index) {
+  const libros = JSON.parse(localStorage.getItem("libros")) || [];
+  if (confirm("¿Seguro que deseas eliminar este libro?")) {
+    libros.splice(index, 1);
+    localStorage.setItem("libros", JSON.stringify(libros));
+    cargarLibros();
+  }
+}
+
+// Gestión de pedidos
 function cargarCompras() {
   const lista = document.getElementById("lista-compras");
   lista.innerHTML = "";
@@ -109,88 +216,5 @@ function eliminarCompra(index) {
     compras.splice(index, 1);
     localStorage.setItem("compras", JSON.stringify(compras));
     cargarCompras();
-  }
-}
-
-// API moneda
-let indicadores = {};
-async function cargarAPI() {
-  try {
-    const res = await fetch("https://mindicador.cl/api");
-    const data = await res.json();
-    indicadores = {
-      uf: data.uf.valor,
-      utm: data.utm.valor,
-      euro: data.euro.valor,
-    };
-    document.getElementById(
-      "valor-uf"
-    ).textContent = `$${indicadores.uf.toLocaleString()}`;
-    document.getElementById(
-      "valor-utm"
-    ).textContent = `$${indicadores.utm.toLocaleString()}`;
-    document.getElementById(
-      "valor-euro"
-    ).textContent = `$${indicadores.euro.toLocaleString()}`;
-  } catch (error) {
-    console.error("Error cargando API:", error);
-  }
-}
-
-function convertirMoneda() {
-  const monto = parseFloat(document.getElementById("convertir-monto").value);
-  const tipo = document.getElementById("convertir-moneda").value;
-  if (!monto || !indicadores[tipo]) return;
-  const resultado = (monto / indicadores[tipo]).toFixed(2);
-  document.getElementById(
-    "resultado-conversion"
-  ).textContent = `${resultado} ${tipo.toUpperCase()}`;
-}
-
-// Gestión de libros
-function agregarLibro(e) {
-  e.preventDefault();
-
-  const titulo = document.getElementById("titulo").value.trim();
-  const autor = document.getElementById("autor").value.trim();
-  const precio = parseInt(document.getElementById("precio").value);
-
-  if (!titulo || !autor || !precio) return;
-
-  const nuevoLibro = { titulo, autor, precio };
-  const libros = JSON.parse(localStorage.getItem("libros")) || [];
-  libros.push(nuevoLibro);
-  localStorage.setItem("libros", JSON.stringify(libros));
-
-  document.getElementById("form-libro").reset();
-  cargarLibros();
-}
-
-function cargarLibros() {
-  const tabla = document.getElementById("tabla-libros");
-  tabla.innerHTML = "";
-
-  const libros = JSON.parse(localStorage.getItem("libros")) || [];
-
-  libros.forEach((libro, index) => {
-    const fila = document.createElement("tr");
-    fila.innerHTML = `
-      <td>${libro.titulo}</td>
-      <td>${libro.autor}</td>
-      <td>$${libro.precio.toLocaleString()}</td>
-      <td>
-        <button class="btn btn-sm btn-danger" onclick="eliminarLibro(${index})">Eliminar</button>
-      </td>
-    `;
-    tabla.appendChild(fila);
-  });
-}
-
-function eliminarLibro(index) {
-  const libros = JSON.parse(localStorage.getItem("libros")) || [];
-  if (confirm("¿Seguro que deseas eliminar este libro?")) {
-    libros.splice(index, 1);
-    localStorage.setItem("libros", JSON.stringify(libros));
-    cargarLibros();
   }
 }
