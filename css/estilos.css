@@ -2,7 +2,7 @@ body {
   background-color: #f8f9fa;
 }
 
-/* Estilo personalizado para navbar rojo oscuro */
+/* Estilo para navbar rojo oscuro */
 .navbar-red {
   background-color: #a11212 !important;
 }
@@ -42,12 +42,12 @@ body {
 }
 
 .navbar-red {
-  background-color: #7e0a0a; /* rojo oscuro */
+  background-color: #7e0a0a;
   font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
 }
 
 .bg-rojo-sparrow {
-  background-color: #7e0a0a; /* o el rojo que usaste */
+  background-color: #7e0a0a;
   font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
   text-decoration: none;
 }

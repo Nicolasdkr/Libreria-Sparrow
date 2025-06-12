@@ -69,7 +69,7 @@ function guardarCompra(e) {
   const moneda = paisSelect.value;
   const fechaNacimiento = document.getElementById("fecha_nacimiento").value;
 
-  // === VALIDACIONES ===
+  // VALIDACIONES
 
   if (nombre.length < 10) {
     alert("El nombre debe tener al menos 10 caracteres.");
@@ -108,7 +108,7 @@ function guardarCompra(e) {
     return;
   }
 
-  // === SI TODO ES VÁLIDO, CONTINÚA ===
+  // SI TODO ES VÁLIDO, CONTINÚA
 
   const hoy = new Date();
   let fechaEntrega = new Date(hoy);
@@ -229,7 +229,7 @@ const libros = {
   },
 };
 
-// === API de indicadores ===
+// API de indicadores
 let indicadores = {};
 async function cargarAPI() {
   try {
@@ -264,7 +264,7 @@ function convertirMoneda() {
   ).textContent = `${resultado} ${tipo.toUpperCase()}`;
 }
 
-// === Cálculo de total ===
+//  Cálculo de total
 function calcularTotal() {
   const libro = document.getElementById("libro").value;
   const cantidad = parseInt(document.getElementById("cantidad").value) || 1;
@@ -329,7 +329,7 @@ function actualizarEnvioTexto(valor) {
   infoEnvio.style.color = "blue";
 }
 
-// === Resumen ===
+// Resumen
 function mostrarResumen(compra) {
   const resumen = document.getElementById("resumen");
   const lista = document.getElementById("resumen-lista");
