@@ -64,7 +64,9 @@ function guardarCompra(e) {
   const cantidad = parseInt(document.getElementById("cantidad").value);
   const pago = document.getElementById("pago").value;
   const envio = document.querySelector('input[name="envio"]:checked')?.value;
-  const pais = document.getElementById("pais-envio").value;
+  const paisSelect = document.getElementById("pais-envio");
+  const pais = paisSelect.options[paisSelect.selectedIndex].text;
+  const moneda = paisSelect.value;
   const fechaNacimiento = document.getElementById("fecha_nacimiento").value;
 
   // === VALIDACIONES ===
@@ -114,10 +116,10 @@ function guardarCompra(e) {
 
   if (envio === "Exprés") {
     fechaEntrega.setDate(hoy.getDate() + 7);
-    costoEnvio = 3000;
+    costoEnvio = 10000;
   } else if (envio === "Estándar") {
     fechaEntrega.setDate(hoy.getDate() + 21);
-    costoEnvio = 1500;
+    costoEnvio = 5000;
   }
 
   const precioUnitario = libros[libro]?.precio || 0;
@@ -137,6 +139,7 @@ function guardarCompra(e) {
     pago,
     envio,
     pais,
+    moneda,
     fecha: hoy.toLocaleDateString(),
     fechaEntrega: fechaEntrega.toLocaleDateString(),
     costoEnvio,
@@ -270,7 +273,7 @@ function calcularTotal() {
     .getElementById("descuento")
     .value.trim()
     .toUpperCase();
-  const pais = document.getElementById("pais-envio").value;
+  const moneda = document.getElementById("pais-envio").value;
   const mostrarTotal = document.getElementById("precio-final");
   const mensajeDescuento = document.getElementById("descuento-aplicado");
   const mostrarConvertido = document.getElementById("precio-convertido");
@@ -283,7 +286,7 @@ function calcularTotal() {
   }
 
   let total = libros[libro].precio * cantidad;
-  total += envio.value === "Exprés" ? 3000 : 1500;
+  total += envio.value === "Exprés" ? 10000 : 5000;
 
   if (descuento === "FANTASIA10") {
     total *= 0.9;
@@ -296,12 +299,12 @@ function calcularTotal() {
     total
   ).toLocaleString()} CLP`;
 
-  if (pais && pais !== "CLP") {
-    const tipo = pais.toLowerCase();
+  if (moneda && moneda !== "CLP") {
+    const tipo = moneda.toLowerCase();
     const tasa = indicadores[tipo];
     if (tasa) {
       const convertido = (total / tasa).toFixed(2);
-      mostrarConvertido.textContent = `≈ ${convertido.toLocaleString()} ${pais}`;
+      mostrarConvertido.textContent = `≈ ${convertido.toLocaleString()} ${moneda}`;
     }
   } else {
     mostrarConvertido.textContent = "";
@@ -340,6 +343,7 @@ function mostrarResumen(compra) {
     { etiqueta: "Dirección", valor: compra.direccion },
     { etiqueta: "Libro", valor: formatearLibro(compra.libro) },
     { etiqueta: "Cantidad", valor: compra.cantidad },
+    { etiqueta: "Moneda", valor: compra.moneda },
     { etiqueta: "Método de Pago", valor: compra.pago },
     { etiqueta: "Tipo de Envío", valor: compra.envio },
     { etiqueta: "País", valor: compra.pais },
@@ -375,6 +379,7 @@ function mostrarResumen(compra) {
   });
 
   resumen.style.display = "block";
+  resumen.scrollIntoView({ behavior: "smooth" });
 }
 
 function formatearLibro(valor) {
