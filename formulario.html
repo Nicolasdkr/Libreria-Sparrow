@@ -110,32 +110,73 @@
         <!-- Libros y cantidad -->
         <hr class="my-4 border-danger" />
         <h5 class="text-danger mb-3">📚 Selección del Libro</h5>
+
         <div class="mb-3">
           <label for="libro" class="form-label">Libro</label>
           <select class="form-select" id="libro" required>
             <option value="">-- Selecciona un libro --</option>
-            <option value="imperio_final">El Imperio Final - $12000</option>
-            <option value="cementerio_animales">
-              Cementerio de Animales - $9500
-            </option>
-            <option value="nombre_del_viento">
-              El Nombre del Viento - $13500
-            </option>
-            <option value="harry_potter">Harry Potter - $11000</option>
-            <option value="lotm">Lord of the Mysteries - $14000</option>
-            <option value="orgullo">Orgullo y Prejuicio - $8000</option>
+            <option value="imperio_final">El Imperio Final</option>
+            <option value="cementerio_animales">Cementerio de Animales</option>
+            <option value="nombre_del_viento">El Nombre del Viento</option>
+            <option value="harry_potter">Harry Potter</option>
+            <option value="lotm">Lord of the Mysteries</option>
+            <option value="orgullo">Orgullo y Prejuicio</option>
           </select>
         </div>
 
-        <div class="text-center mb-3">
-          <img
-            id="imagen-libro"
-            src=""
-            alt="Imagen del libro"
-            class="img-fluid rounded shadow"
-            style="max-width: 300px; display: none"
+        <!-- Detalles del libro -->
+        <div
+          id="detalles-libro"
+          class="mt-4 p-3 bg-white border rounded shadow"
+          style="display: none"
+        >
+          <div class="row">
+            <div class="col-md-4 text-center">
+              <img
+                id="detalle-imagen"
+                src=""
+                alt="Portada del libro"
+                class="img-fluid rounded shadow"
+              />
+            </div>
+            <div class="col-md-8">
+              <p><strong>Título:</strong> <span id="detalle-titulo"></span></p>
+              <p><strong>Autor:</strong> <span id="detalle-autor"></span></p>
+              <p>
+                <strong>Descripción:</strong>
+                <span id="detalle-descripcion"></span>
+              </p>
+              <p>
+                <strong>Categoría:</strong> <span id="detalle-categoria"></span>
+              </p>
+              <p>
+                <strong>Precio:</strong>
+                <span id="detalle-precio" class="text-warning fw-bold"></span>
+              </p>
+              <p>
+                <strong>Stock disponible:</strong>
+                <span id="detalle-stock"></span>
+              </p>
+              <p><strong>Estado:</strong> <span id="detalle-estado"></span></p>
+              <p>
+                <strong>Proveedor:</strong> <span id="detalle-proveedor"></span>
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Cantidad -->
+        <div class="mb-3 mt-4">
+          <label for="cantidad" class="form-label">Cantidad</label>
+          <input
+            type="number"
+            class="form-control"
+            id="cantidad"
+            min="1"
+            max="1000"
+            value="1"
+            required
           />
-          <p id="precio-libro" class="fw-bold mt-2 text-warning"></p>
         </div>
 
         <div class="mb-3">

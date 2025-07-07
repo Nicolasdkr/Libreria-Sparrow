@@ -55,6 +55,7 @@ function validarRUT(rut) {
 function guardarCompra(e) {
   e.preventDefault();
 
+  // Obtener valores del formulario
   const nombre = document.getElementById("nombre").value.trim();
   const rut = document.getElementById("rut").value.trim();
   const email = document.getElementById("email").value.trim();
@@ -68,90 +69,94 @@ function guardarCompra(e) {
   const pais = paisSelect.options[paisSelect.selectedIndex].text;
   const moneda = paisSelect.value;
   const fechaNacimiento = document.getElementById("fecha_nacimiento").value;
+  const descuento = document
+    .getElementById("descuento")
+    .value.trim()
+    .toUpperCase();
 
-  // VALIDACIONES
-
+  // Validaciones
   if (nombre.length < 10) {
     alert("El nombre debe tener al menos 10 caracteres.");
     return;
   }
-
   if (direccion.length < 5) {
     alert("La dirección debe tener al menos 5 caracteres.");
     return;
   }
-
   if (!validarRUT(rut)) {
     alert("RUT inválido");
     return;
   }
-
   if (!validarEmail(email)) {
     alert("Correo electrónico inválido.");
     return;
   }
-
   if (!validarTelefonoChileno(telefono)) {
     alert(
       "El número de teléfono debe comenzar con +569 y tener 12 dígitos en total."
     );
     return;
   }
-
   if (isNaN(cantidad) || cantidad < 1 || cantidad > 1000) {
     alert("Debes pedir al menos 1 libro y como máximo 1000.");
     return;
   }
-
   if (!fechaNacimiento || !mayorDeEdad(fechaNacimiento)) {
     alert("Debes ser mayor de 18 años para realizar una compra.");
     return;
   }
 
-  // SI TODO ES VÁLIDO, CONTINÚA
-
+  // Cálculos
   const hoy = new Date();
   let fechaEntrega = new Date(hoy);
-  let costoEnvio = 0;
+  let costoEnvio = envio === "Exprés" ? 10000 : 5000;
+  fechaEntrega.setDate(hoy.getDate() + (envio === "Exprés" ? 7 : 21));
 
-  if (envio === "Exprés") {
-    fechaEntrega.setDate(hoy.getDate() + 7);
-    costoEnvio = 10000;
-  } else if (envio === "Estándar") {
-    fechaEntrega.setDate(hoy.getDate() + 21);
-    costoEnvio = 5000;
-  }
-
-  const precioUnitario = libros[libro]?.precio || 0;
+  const libroSeleccionado = libros[libro];
+  const precioUnitario = libroSeleccionado?.precio || 0;
   const totalLibros = precioUnitario * cantidad;
-  const totalFinal = totalLibros + costoEnvio;
-  const nombreEncriptado = btoa(nombre);
+  const descuentoAplicado = descuento === "FANTASIA10";
+  const totalFinal = descuentoAplicado
+    ? totalLibros * 0.9 + costoEnvio
+    : totalLibros + costoEnvio;
 
-  const compra = {
+  // Construcción del pedido
+  const pedido = {
+    cliente_id: null, // Se asignará en backend
     nombre,
-    nombreEncriptado,
+    nombre_encriptado: btoa(nombre),
     rut,
     email,
     telefono,
     direccion,
-    libro,
-    cantidad,
-    pago,
-    envio,
     pais,
     moneda,
-    fecha: hoy.toLocaleDateString(),
-    fechaEntrega: fechaEntrega.toLocaleDateString(),
-    costoEnvio,
-    precioUnitario,
-    totalFinal,
+    fecha_nacimiento: new Date(fechaNacimiento),
+    productos: [
+      {
+        producto_id: null, // Se asignará en backend
+        titulo: libroSeleccionado.titulo,
+        cantidad,
+        precio_unitario: precioUnitario,
+      },
+    ],
+    total_libros: totalLibros,
+    descuento_aplicado: descuentoAplicado,
+    costo_envio: costoEnvio,
+    total_final: Math.round(totalFinal),
+    estado_envio: "Pendiente",
+    método_pago: pago,
+    tipo_envio: envio,
+    fecha_pedido: hoy,
+    fecha_entrega: fechaEntrega,
   };
 
-  const compras = JSON.parse(localStorage.getItem("compras")) || [];
-  compras.push(compra);
-  localStorage.setItem("compras", JSON.stringify(compras));
+  // Guardar en localStorage (simulación)
+  const pedidos = JSON.parse(localStorage.getItem("pedidos")) || [];
+  pedidos.push(pedido);
+  localStorage.setItem("pedidos", JSON.stringify(pedidos));
 
-  mostrarResumen(compra);
+  mostrarResumen(pedido);
   document.getElementById("form-compra").reset();
   calcularTotal();
 }
@@ -181,17 +186,34 @@ function encriptarNombre() {
 }
 
 function mostrarLibro() {
-  const libro = document.getElementById("libro").value;
-  const imagen = document.getElementById("imagen-libro");
-  const precio = document.getElementById("precio-libro");
+  const libroId = document.getElementById("libro").value;
+  const libro = libros[libroId];
+  const detalles = document.getElementById("detalles-libro");
 
-  if (libros[libro]) {
-    imagen.src = libros[libro].imagen;
-    imagen.style.display = "block";
-    precio.textContent = `Precio: $${libros[libro].precio.toLocaleString()}`;
+  if (libro) {
+    // Mostrar imagen
+    document.getElementById("detalle-imagen").src = libro.imagen;
+    document.getElementById(
+      "detalle-imagen"
+    ).alt = `Portada de ${libro.titulo}`;
+
+    // Mostrar detalles
+    document.getElementById("detalle-titulo").textContent = libro.titulo;
+    document.getElementById("detalle-autor").textContent = libro.autor;
+    document.getElementById("detalle-descripcion").textContent =
+      libro.descripcion;
+    document.getElementById("detalle-categoria").textContent = libro.categoria;
+    document.getElementById(
+      "detalle-precio"
+    ).textContent = `$${libro.precio.toLocaleString()}`;
+    document.getElementById("detalle-stock").textContent = libro.stock;
+    document.getElementById("detalle-estado").textContent = libro.estado;
+    document.getElementById("detalle-proveedor").textContent =
+      libro.proveedor_id || "N/A";
+
+    detalles.style.display = "block";
   } else {
-    imagen.style.display = "none";
-    precio.textContent = "";
+    detalles.style.display = "none";
   }
 }
 

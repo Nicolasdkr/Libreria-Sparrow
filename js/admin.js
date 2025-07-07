@@ -6,13 +6,15 @@ document.addEventListener("DOMContentLoaded", () => {
     .getElementById("form-libro")
     .addEventListener("submit", agregarLibro);
   cargarAPI();
-  cargarCompras();
   cargarLibros();
+  cargarPedidos();
+  cargarClientes();
+  calcularTop10();
 });
 
 let indiceEdicion = null;
 
-// Clave de acceso
+// 🔐 Clave de acceso
 function verificarClave() {
   const clave = document.getElementById("clave-admin").value;
   const mensaje = document.getElementById("mensaje-clave");
@@ -25,7 +27,7 @@ function verificarClave() {
   }
 }
 
-// API moneda
+// 💱 API moneda
 let indicadores = {};
 async function cargarAPI() {
   try {
@@ -60,25 +62,31 @@ function convertirMoneda() {
   ).textContent = `${resultado} ${tipo.toUpperCase()}`;
 }
 
-// Gestión de libros
+// 📚 Gestión de libros
 function agregarLibro(e) {
   e.preventDefault();
 
-  const titulo = document.getElementById("titulo").value.trim();
-  const autor = document.getElementById("autor").value.trim();
-  const precio = parseInt(document.getElementById("precio").value);
+  const libro = {
+    titulo: document.getElementById("titulo").value.trim(),
+    autor: document.getElementById("autor").value.trim(),
+    categoria: document.getElementById("categoria").value.trim(),
+    precio: parseInt(document.getElementById("precio").value),
+    stock: parseInt(document.getElementById("stock").value),
+    estado: document.getElementById("estado").value,
+    proveedor_id: document.getElementById("proveedor").value.trim(),
+  };
 
-  if (!titulo || !autor || isNaN(precio)) return;
+  if (!libro.titulo || !libro.autor || isNaN(libro.precio)) return;
 
   const libros = JSON.parse(localStorage.getItem("libros")) || [];
 
   if (indiceEdicion !== null) {
-    libros[indiceEdicion] = { titulo, autor, precio };
+    libros[indiceEdicion] = libro;
     indiceEdicion = null;
     document.querySelector("#form-libro button[type='submit']").textContent =
-      "Agregar";
+      "Agregar Libro";
   } else {
-    libros.push({ titulo, autor, precio });
+    libros.push(libro);
   }
 
   localStorage.setItem("libros", JSON.stringify(libros));
@@ -97,7 +105,11 @@ function cargarLibros() {
     fila.innerHTML = `
       <td>${libro.titulo}</td>
       <td>${libro.autor}</td>
+      <td>${libro.categoria}</td>
       <td>$${libro.precio.toLocaleString()}</td>
+      <td>${libro.stock}</td>
+      <td>${libro.estado}</td>
+      <td>${libro.proveedor_id || "-"}</td>
       <td class="d-flex gap-2 justify-content-center">
         <button class="btn btn-sm btn-warning" onclick="editarLibro(${index})">Editar</button>
         <button class="btn btn-sm btn-danger" onclick="eliminarLibro(${index})">Eliminar</button>
@@ -113,10 +125,13 @@ function editarLibro(index) {
 
   document.getElementById("titulo").value = libro.titulo;
   document.getElementById("autor").value = libro.autor;
+  document.getElementById("categoria").value = libro.categoria;
   document.getElementById("precio").value = libro.precio;
+  document.getElementById("stock").value = libro.stock;
+  document.getElementById("estado").value = libro.estado;
+  document.getElementById("proveedor").value = libro.proveedor_id;
 
   indiceEdicion = index;
-
   document.querySelector("#form-libro button[type='submit']").textContent =
     "Guardar Cambios";
 }
@@ -130,91 +145,127 @@ function eliminarLibro(index) {
   }
 }
 
-// Gestión de pedidos
-function cargarCompras() {
-  const lista = document.getElementById("lista-compras");
-  lista.innerHTML = "";
+// 📦 Gestión de pedidos
+function cargarPedidos() {
+  const tabla = document.getElementById("tabla-pedidos");
+  tabla.innerHTML = "";
 
-  const compras = JSON.parse(localStorage.getItem("compras")) || [];
+  const pedidos = JSON.parse(localStorage.getItem("pedidos")) || [];
 
-  if (compras.length === 0) {
-    lista.innerHTML = "<p class='text-muted'>No hay pedidos registrados.</p>";
-    return;
-  }
+  let enviados = 0;
+  let pendientes = 0;
 
-  compras.forEach((compra, index) => {
-    const totalCalculado =
-      (compra.precioUnitario || 0) * (compra.cantidad || 1) +
-      (compra.costoEnvio || 0);
+  pedidos.forEach((pedido, index) => {
+    if (pedido.estado_envio === "Enviado") enviados++;
+    else pendientes++;
 
-    const card = document.createElement("div");
-    card.className = "card text-dark bg-light mb-4 shadow-sm";
-
-    const cardBody = `
-      <div class="card-body">
-        <h5 class="card-title">📦 Pedido de ${compra.nombre}</h5>
-        <p><strong>Nombre encriptado:</strong> <code>${
-          compra.nombreEncriptado || "-"
-        }</code></p>
-        <p><strong>RUT:</strong> ${compra.rut}</p>
-        <p><strong>Email:</strong> ${compra.email}</p>
-        <p><strong>Teléfono:</strong> ${compra.telefono}</p>
-        <p><strong>Dirección:</strong>
-          <input type="text" class="form-control mb-2" value="${
-            compra.direccion
-          }" id="direccion-${index}">
-        </p>
-        <p><strong>Libro:</strong> ${compra.libro}</p>
-        <p><strong>Cantidad:</strong> ${compra.cantidad}</p>
-        <p><strong>Precio Unitario:</strong> $${(
-          compra.precioUnitario || 0
-        ).toLocaleString()}</p>
-        <p><strong>Método de pago:</strong>
-          <input type="text" class="form-control mb-2" value="${
-            compra.pago
-          }" id="pago-${index}">
-        </p>
-        <p><strong>Tipo de envío:</strong> ${compra.envio}</p>
-        <p><strong>Costo de envío:</strong> $${(
-          compra.costoEnvio || 0
-        ).toLocaleString()}</p>
-        <p><strong>País:</strong> ${compra.pais}</p>
-        <p><strong>Fecha de compra:</strong> ${compra.fecha}</p>
-        <p><strong>Fecha estimada de entrega:</strong> ${
-          compra.fechaEntrega
-        }</p>
-        <p class="fw-bold text-success">💰 Total a pagar: $${totalCalculado.toLocaleString()} CLP</p>
-
-        <div class="d-flex justify-content-end gap-2 mt-3">
-          <button class="btn btn-success btn-sm" onclick="guardarEdicion(${index})">Guardar</button>
-          <button class="btn btn-danger btn-sm" onclick="eliminarCompra(${index})">Eliminar</button>
-        </div>
-      </div>
+    const fila = document.createElement("tr");
+    fila.innerHTML = `
+      <td>${pedido.nombre}</td>
+      <td>${pedido.productos[0]?.titulo || "-"}</td>
+      <td>${pedido.productos[0]?.cantidad || 1}</td>
+      <td>$${pedido.total_final.toLocaleString()}</td>
+      <td>
+        <select onchange="actualizarEstadoPedido(${index}, this.value)" class="form-select form-select-sm">
+          <option ${
+            pedido.estado_envio === "Pendiente" ? "selected" : ""
+          }>Pendiente</option>
+          <option ${
+            pedido.estado_envio === "Enviado" ? "selected" : ""
+          }>Enviado</option>
+          <option ${
+            pedido.estado_envio === "Recibido" ? "selected" : ""
+          }>Recibido</option>
+        </select>
+      </td>
+      <td>
+        <button class="btn btn-sm btn-danger" onclick="eliminarPedido(${index})">Eliminar</button>
+      </td>
     `;
+    tabla.appendChild(fila);
+  });
 
-    card.innerHTML = cardBody;
-    lista.appendChild(card);
+  document.getElementById("contador-enviados").textContent = enviados;
+  document.getElementById("contador-pendientes").textContent = pendientes;
+}
+
+function actualizarEstadoPedido(index, nuevoEstado) {
+  const pedidos = JSON.parse(localStorage.getItem("pedidos")) || [];
+  pedidos[index].estado_envio = nuevoEstado;
+  localStorage.setItem("pedidos", JSON.stringify(pedidos));
+  cargarPedidos();
+}
+
+function eliminarPedido(index) {
+  const pedidos = JSON.parse(localStorage.getItem("pedidos")) || [];
+  if (confirm("¿Eliminar este pedido?")) {
+    pedidos.splice(index, 1);
+    localStorage.setItem("pedidos", JSON.stringify(pedidos));
+    cargarPedidos();
+  }
+}
+
+// 👥 Gestión de clientes
+function cargarClientes() {
+  const tabla = document.getElementById("tabla-clientes");
+  tabla.innerHTML = "";
+
+  const clientes = JSON.parse(localStorage.getItem("clientes")) || [];
+
+  clientes.forEach((cliente, index) => {
+    const fila = document.createElement("tr");
+    fila.innerHTML = `
+      <td>${cliente.nombre}</td>
+      <td>${cliente.rut}</td>
+      <td>${cliente.email}</td>
+      <td>${cliente.telefono}</td>
+      <td>${cliente.pedido_activo ? "✅" : "❌"}</td>
+      <td>
+        <button class="btn btn-sm btn-danger" onclick="eliminarCliente(${index})">Eliminar</button>
+      </td>
+    `;
+    tabla.appendChild(fila);
   });
 }
 
-function guardarEdicion(index) {
-  const compras = JSON.parse(localStorage.getItem("compras")) || [];
-
-  compras[index].direccion = document.getElementById(
-    `direccion-${index}`
-  ).value;
-  compras[index].pago = document.getElementById(`pago-${index}`).value;
-
-  localStorage.setItem("compras", JSON.stringify(compras));
-  alert("✅ Pedido actualizado correctamente.");
-  cargarCompras();
+function eliminarCliente(index) {
+  const clientes = JSON.parse(localStorage.getItem("clientes")) || [];
+  if (confirm("¿Eliminar este cliente?")) {
+    clientes.splice(index, 1);
+    localStorage.setItem("clientes", JSON.stringify(clientes));
+    cargarClientes();
+  }
 }
 
-function eliminarCompra(index) {
-  const compras = JSON.parse(localStorage.getItem("compras")) || [];
-  if (confirm("¿Estás seguro de que deseas eliminar este pedido?")) {
-    compras.splice(index, 1);
-    localStorage.setItem("compras", JSON.stringify(compras));
-    cargarCompras();
+// 📈 Top 10 productos más vendidos
+function calcularTop10() {
+  const pedidos = JSON.parse(localStorage.getItem("pedidos")) || [];
+  const conteo = {};
+
+  pedidos.forEach((pedido) => {
+    pedido.productos.forEach((prod) => {
+      if (!conteo[prod.titulo]) {
+        conteo[prod.titulo] = 0;
+      }
+      conteo[prod.titulo] += prod.cantidad;
+    });
+  });
+
+  const top = Object.entries(conteo)
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, 10);
+
+  const lista = document.getElementById("top-productos");
+  lista.innerHTML = "";
+
+  if (top.length === 0) {
+    lista.innerHTML = "<li class='text-muted'>No hay datos disponibles.</li>";
+    return;
   }
+
+  top.forEach(([titulo, cantidad]) => {
+    const item = document.createElement("li");
+    item.textContent = `${titulo} — ${cantidad} vendidos`;
+    lista.appendChild(item);
+  });
 }
